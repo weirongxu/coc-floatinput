@@ -16,6 +16,14 @@ Floating input for coc.nvim
 
 `nmap <silent> <Leader>rn <Plug>(coc-floatinput-rename)`
 
+## Highlight
+
+```vim
+autocmd ColorScheme *
+      \ hi CocHelperNormalFloatBorder guifg=#dddddd guibg=#575B54
+      \ | hi CocHelperNormalFloat guibg=#575B54
+```
+
 ## Screenshot
 
 ![image](https://user-images.githubusercontent.com/1709861/90628942-13c30e00-e251-11ea-81af-683363ae5370.png)

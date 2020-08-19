@@ -2,7 +2,7 @@ import { activateHelper } from 'coc-helper';
 import { commands, ExtensionContext, workspace } from 'coc.nvim';
 import { CocCommandProvider, VimCommandProvider } from './ListProvider';
 import { FloatingInput } from './FloatingInput';
-import { registerRename as registerRenameCommand } from './rename';
+import { registerRename } from './rename';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   if (workspace.isVim) {
@@ -57,5 +57,5 @@ export async function activate(context: ExtensionContext): Promise<void> {
     subscriptions,
   );
 
-  await registerRenameCommand(context);
+  await registerRename(context);
 }

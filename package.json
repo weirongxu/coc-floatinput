@@ -7,7 +7,9 @@
   "license": "MIT",
   "main": "lib/index.js",
   "keywords": [
-    "coc.nvim"
+    "coc.nvim",
+    "neovim",
+    "floatwin"
   ],
   "engines": {
     "coc": "^0.0.77"

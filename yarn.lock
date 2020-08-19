@@ -744,10 +744,10 @@ cliui@^5.0.0:
     strip-ansi "^5.2.0"
     wrap-ansi "^5.1.0"
 
-coc-helper@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.0.5.tgz#67ccf40dc51335622a3f2271cc493e9e9ca46b22"
-  integrity sha512-swVRMIGO/fY5o+Jh6kzDRXz0pxLpnxAqFFzzLskCM1R/lgwhxfFVClU2LwOue5zFjcMKhQMSw2ltUa/btL9+aw==
+coc-helper@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.0.6.tgz#9e6c96dee17821f9fdf862b7730a70b229c2570e"
+  integrity sha512-Xm9jKtdraik4ydtuFZ/19KinvrAHJe+z6FJtVlTTmsJ6NjP98Tj3uEKiTdkrmbytJ3X8eCrRQ1EVUv13jFXY7g==
 
 coc.nvim@^0.0.77:
   version "0.0.77"

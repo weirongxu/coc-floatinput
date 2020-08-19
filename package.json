@@ -19,7 +19,8 @@
     "clean": "rimraf lib",
     "watch": "webpack --watch",
     "build": "webpack",
-    "prepare": "npm-run-all clean build"
+    "prepare": "npm-run-all clean build",
+    "test": "yarn lint"
   },
   "prettier": {
     "singleQuote": true,

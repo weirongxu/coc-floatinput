@@ -42,7 +42,7 @@ export class VimCommandProvider extends ListProvider {
   async getList(prefix: string): Promise<ListItem[]> {
     const cmds = (await workspace.nvim.call('getcompletion', [
       prefix,
-      'command',
+      'cmdline',
     ])) as string[];
     return cmds.map((c) => ({
       name: c,

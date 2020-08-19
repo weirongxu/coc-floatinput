@@ -35,7 +35,7 @@
     "@types/node": "^14.6.0",
     "@typescript-eslint/eslint-plugin": "^3.9.1",
     "@typescript-eslint/parser": "^3.9.1",
-    "coc-helper": "^0.0.6",
+    "coc-helper": "^0.0.9",
     "coc.nvim": "^0.0.77",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",

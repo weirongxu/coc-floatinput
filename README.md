@@ -16,6 +16,11 @@ Floating input for coc.nvim
 
 `nmap <silent> <Leader>rn <Plug>(coc-floatinput-rename)`
 
+## Screenshot
+
+![image](https://user-images.githubusercontent.com/1709861/90628942-13c30e00-e251-11ea-81af-683363ae5370.png)
+![image](https://user-images.githubusercontent.com/1709861/90628904-03ab2e80-e251-11ea-97c7-5eec56b7821f.png)
+
 ## License
 
 MIT

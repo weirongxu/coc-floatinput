@@ -6,38 +6,40 @@ import {
   CompletionItemProvider,
   events,
   workspace,
+  disposeAll,
 } from 'coc.nvim';
 import { asyncCatch } from './util';
 
-type OnConfirm = (
-  content: string,
-  context: { bufnr: number },
-) => void | Promise<void>;
+export namespace FloatingInput {
+  export type OnConfirmed = (
+    content: string,
+    context: { bufnr: number },
+  ) => void | Promise<void>;
 
-type FloatingInputOptions = {
-  title: string;
-  command: string;
-  plugmap?: string;
-  filetype: string;
-  relative: FloatingWindow.OpenOptions['relative'];
-  getOpenOptions?: () => Promise<
-    | {
-        top?: number;
-        left?: number;
-        title?: string;
-        width?: number;
-        height?: number;
-        text?: string;
-        relative?: FloatingInputOptions['relative'];
-      }
-    | false
-  >;
-  completion?: {
-    short: string;
-    provider: CompletionItemProvider;
+  export type OnClosed = (context: { bufnr: number }) => void | Promise<void>;
+
+  export type Options = {
+    title: string;
+    relative: FloatingWindow.OpenOptions['relative'];
+    command?: string;
+    plugmap?: string;
+    filetype?: string;
+    defaultOpenOptions?: Partial<FloatingWindow.OpenOptions>;
+    optionsOnTrigger?: () => Promise<
+      | {
+          openOptions?: Partial<FloatingWindow.OpenOptions>;
+          text?: string;
+        }
+      | false
+    >;
+    completion?: {
+      short: string;
+      provider: CompletionItemProvider;
+    };
+    onConfirmed?: OnConfirmed;
+    onClosed?: OnClosed;
   };
-  onConfirm?: OnConfirm;
-};
+}
 
 export class FloatingInput {
   protected static maxId = 0;
@@ -46,15 +48,15 @@ export class FloatingInput {
   protected static quitCmd = 'floatinput.quit';
   protected static inited = false;
 
+  protected openCallback?: () => Promise<void>;
+
   disposables: Disposable[] = [];
   id: number;
-
-  static floatWinByBufnr(bufnr: number) {
-    return this.instancesMap.get(bufnr)?.floatWin;
-  }
+  protected opened = false;
+  finalOpenOptions?: FloatingWindow.OpenOptions;
 
   static async create(
-    options: FloatingInputOptions,
+    options: FloatingInput.Options,
     disposables: Disposable[],
   ) {
     if (!this.inited) {
@@ -71,17 +73,43 @@ export class FloatingInput {
         }
       }
       disposables.push(
+        events.on('BufEnter', async (bufnr) => {
+          const it = this.instancesMap.get(bufnr);
+          if (!it) {
+            await Promise.all(
+              Array.from(this.instancesMap.values())
+                .filter((it) => it.opened)
+                .map(async (it) => {
+                  await it.close();
+                }),
+            );
+          }
+        }),
         events.on('BufWinLeave', async (bufnr) => {
           const it = this.instancesMap.get(bufnr);
           if (it) {
             await it.floatWin.buffer.setOption('buftype', 'nofile');
           }
         }),
+        events.on('TextChanged', async (bufnr) => {
+          const it = this.instancesMap.get(bufnr);
+          if (!it) {
+            return;
+          }
+          await it.adjustAutoResize();
+        }),
+        events.on('TextChangedI', async (bufnr) => {
+          const it = this.instancesMap.get(bufnr);
+          if (!it) {
+            return;
+          }
+          await it.adjustAutoResize();
+        }),
         commands.registerCommand(
           this.confirmCmd,
           async (bufnr: number, mode: string, targetMode: string) => {
             const it = this.instancesMap.get(bufnr);
-            if (!it || !it.options.onConfirm) {
+            if (!it || !it.options.onConfirmed) {
               return;
             }
 
@@ -93,7 +121,8 @@ export class FloatingInput {
             });
             const content = lines[0];
             await utilModule.closeWinByBufnr.call([bufnr]);
-            await it.options.onConfirm(content, { bufnr });
+            await it.options.onConfirmed(content, { bufnr });
+            await it.options.onClosed?.({ bufnr });
             await changeMode(mode, targetMode);
           },
           undefined,
@@ -106,7 +135,7 @@ export class FloatingInput {
             if (!it) {
               return;
             }
-            await utilModule.closeWinByBufnr.call([bufnr]);
+            await it.close();
             await changeMode(mode, targetMode);
           },
           undefined,
@@ -131,73 +160,164 @@ export class FloatingInput {
     return floatInput;
   }
 
+  static async input(
+    title: string,
+    defaultText: string,
+    options: Partial<FloatingInput.Options>,
+  ): Promise<string | undefined> {
+    const disposables: Disposable[] = [];
+    let result: string | undefined;
+    await new Promise(async (resolve) => {
+      const floatInput = await this.create(
+        {
+          title,
+          relative: 'cursor-around',
+          async optionsOnTrigger() {
+            return {
+              text: defaultText,
+            };
+          },
+          onConfirmed(confirmText) {
+            result = confirmText;
+          },
+          onClosed() {
+            disposeAll(disposables);
+            resolve();
+          },
+          ...options,
+        },
+        disposables,
+      );
+      await floatInput.open();
+    });
+    return result;
+  }
+
   protected constructor(
     public floatWin: FloatingWindow,
-    public options: FloatingInputOptions,
+    public options: FloatingInput.Options,
     disposables: Disposable[],
   ) {
     FloatingInput.maxId += 1;
     this.id = FloatingInput.maxId;
 
-    const callback = asyncCatch(async () => {
+    this.openCallback = asyncCatch(async () => {
       if (!this.floatWin) {
         this.floatWin = await FloatingWindow.create({
           mode: 'base',
+          inited_execute: (ctx) => `
+            call setbufvar(${ctx.bufnr}, '&wrap', 1)
+          `,
         });
       }
       const targetMode = await workspace.nvim.call('mode');
-      const openOptions = await options.getOpenOptions?.();
-      if (openOptions === false) {
+      const triggerOptions = await options.optionsOnTrigger?.();
+      if (triggerOptions === false) {
         return;
       }
-      await this.floatWin.open({
-        relative: openOptions?.relative ?? options.relative,
-        top: openOptions?.top ?? 0,
-        left: openOptions?.left ?? 0,
-        title: openOptions?.title ?? options.title,
-        width: openOptions?.width ?? 30,
-        height: openOptions?.height ?? 1,
+      this.finalOpenOptions = {
+        relative: options.relative,
+        top: 0,
+        left: 0,
+        title: options.title,
+        width: 30,
+        height: 1,
         border: [],
         modifiable: true,
         focus: true,
         filetype: options.filetype,
         inited_execute: (ctx) => `
-              call setbufvar(${ctx.bufnr}, '&buftype', '')
-              execute 'nmap <silent><buffer> <CR> :call CocAction("runCommand", "${
-                FloatingInput.confirmCmd
-              }", ' . ${ctx.bufnr} . ', "n", "${targetMode}")<CR>'
-              execute 'imap <silent><buffer> <CR> <C-o>:call CocAction("runCommand", "${
-                FloatingInput.confirmCmd
-              }", ' . ${ctx.bufnr} . ', "i", "${targetMode}")<CR>'
-              execute 'nmap <silent><buffer> <ESC> :call CocAction("runCommand", "${
-                FloatingInput.quitCmd
-              }", ' . ${ctx.bufnr} . ', "n", "${targetMode}")<CR>'
-              ${
-                openOptions?.text
-                  ? `call setline(1, '${openOptions.text.replace(/'/g, "''")}')`
-                  : ''
-              }
-              call feedkeys('A')
-            `,
-      });
+          call setbufvar(${ctx.bufnr}, '&buftype', '')
+          call setbufvar(${ctx.bufnr}, '&wrap', 1)
+          execute 'nmap <silent><buffer> <CR> :call CocAction("runCommand", "${
+            FloatingInput.confirmCmd
+          }", ' . ${ctx.bufnr} . ', "n", "${targetMode}")<CR>'
+          execute 'imap <silent><buffer> <CR> <C-o>:call CocAction("runCommand", "${
+            FloatingInput.confirmCmd
+          }", ' . ${ctx.bufnr} . ', "i", "${targetMode}")<CR>'
+          execute 'nmap <silent><buffer> <ESC> :call CocAction("runCommand", "${
+            FloatingInput.quitCmd
+          }", ' . ${ctx.bufnr} . ', "n", "${targetMode}")<CR>'
+          execute 'imap <silent><buffer> <C-c> <C-o>:call CocAction("runCommand", "${
+            FloatingInput.quitCmd
+          }", ' . ${ctx.bufnr} . ', "i", "${targetMode}")<CR>'
+          ${
+            triggerOptions?.text
+              ? `call setline(1, '${triggerOptions.text.replace(/'/g, "''")}')`
+              : ''
+          }
+          call feedkeys('A')
+        `,
+        ...(options.defaultOpenOptions ?? {}),
+        ...(triggerOptions?.openOptions ?? {}),
+      };
+      await this.floatWin.open(this.finalOpenOptions);
+      this.opened = true;
     });
 
-    disposables.push(commands.registerCommand(options.command, callback));
+    if (options.command) {
+      disposables.push(
+        commands.registerCommand(options.command, () => this.openCallback),
+      );
+    }
     if (options.plugmap) {
       disposables.push(
-        workspace.registerKeymap(['n', 'v', 'i'], options.plugmap, callback),
+        workspace.registerKeymap(
+          ['n', 'v', 'i'],
+          options.plugmap,
+          this.openCallback,
+        ),
       );
     }
 
     if (options.completion) {
-      disposables.push(
-        languages.registerCompletionItemProvider(
-          options.filetype,
-          options.completion.short,
-          [options.filetype],
-          options.completion.provider,
-        ),
-      );
+      if (!options.filetype) {
+        // eslint-disable-next-line no-restricted-properties
+        workspace.showMessage(
+          'completion.provider require a filetype',
+          'warning',
+        );
+      } else {
+        disposables.push(
+          languages.registerCompletionItemProvider(
+            options.filetype,
+            options.completion.short,
+            [options.filetype],
+            options.completion.provider,
+          ),
+        );
+      }
     }
+  }
+
+  async open() {
+    await this.openCallback?.();
+  }
+
+  async adjustAutoResize() {
+    if (!this.finalOpenOptions) {
+      return;
+    }
+    const width = this.finalOpenOptions.width;
+    const lines = await this.floatWin.buffer.getLines();
+    const heights = await Promise.all(
+      lines.map(async (l) => {
+        const strwidth: number = await workspace.nvim.call('strdisplaywidth', [
+          l,
+        ]);
+        return Math.ceil((strwidth || 1) / width);
+      }),
+    );
+    const height = heights.reduce((c, h) => c + h);
+    if (height !== this.finalOpenOptions.height) {
+      this.finalOpenOptions.height = height;
+      await this.floatWin.resize(this.finalOpenOptions);
+    }
+  }
+
+  async close() {
+    await this.floatWin.close();
+    await this.options.onClosed?.({ bufnr: this.floatWin.bufnr });
+    this.opened = false;
   }
 }

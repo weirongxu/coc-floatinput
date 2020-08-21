@@ -1,10 +1,23 @@
 import { activateHelper } from 'coc-helper';
 import { commands, ExtensionContext, workspace } from 'coc.nvim';
-import { CocCommandProvider, VimCommandProvider } from './ListProvider';
+import {
+  CocCommandProvider,
+  VimCommandProvider,
+  ListProvider,
+} from './ListProvider';
 import { FloatingInput } from './FloatingInput';
 import { registerRename } from './rename';
 
-export async function activate(context: ExtensionContext): Promise<void> {
+type FloatInputApi =
+  | {
+      FloatingInput: typeof FloatingInput;
+      ListProvider: typeof ListProvider;
+    }
+  | undefined;
+
+export async function activate(
+  context: ExtensionContext,
+): Promise<FloatInputApi> {
   if (workspace.isVim) {
     // eslint-disable-next-line no-restricted-properties
     workspace.showMessage('coc-floatinput only support neovim', 'warning');
@@ -29,7 +42,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         short: 'C',
         provider: new VimCommandProvider(),
       },
-      async onConfirm(content) {
+      async onConfirmed(content) {
         return workspace.nvim.command(content);
       },
     },
@@ -50,7 +63,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         short: 'C',
         provider: new CocCommandProvider(),
       },
-      async onConfirm(content) {
+      async onConfirmed(content) {
         return commands.executeCommand(content);
       },
     },
@@ -58,4 +71,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
   );
 
   await registerRename(context);
+
+  return { FloatingInput, ListProvider };
 }
+
+export { FloatingInput, ListProvider, FloatInputApi };

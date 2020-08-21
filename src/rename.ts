@@ -36,7 +36,7 @@ export async function registerRename(context: ExtensionContext) {
       filetype: 'floatinput-coc-rename',
       command: 'floatinput.rename',
       plugmap: 'floatinput-rename',
-      getOpenOptions: async () => {
+      optionsOnTrigger: async () => {
         const doc = await workspace.document;
         if (!hasProviderRename(doc)) {
           return false;
@@ -64,7 +64,7 @@ export async function registerRename(context: ExtensionContext) {
         short: 'C',
         provider,
       },
-      async onConfirm(content) {
+      async onConfirmed(content) {
         if (!content) {
           // eslint-disable-next-line no-restricted-properties
           workspace.showMessage('Empty name, canceled', 'warning');

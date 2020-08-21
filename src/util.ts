@@ -1,4 +1,4 @@
-import { genAsyncCatch, genOnError } from 'coc-helper';
+import { genAsyncCatch, genOnError, sleep } from 'coc-helper';
 import { workspace, Document } from 'coc.nvim';
 
 const outputChannel = workspace.createOutputChannel('coc-floatinput');
@@ -13,10 +13,4 @@ export async function synchronizeDocument(doc: Document): Promise<void> {
   if (changedtick !== doc.changedtick) {
     await sleep(50);
   }
-}
-
-export function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }

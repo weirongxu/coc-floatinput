@@ -5,7 +5,15 @@ import { escapedKeysModule } from './escapeKeys';
 jestHelper.boot();
 
 beforeAll(async () => {
-  await VimModule.init();
+  await VimModule.init({
+    logger: null as any,
+    globalState: null as any,
+    subscriptions: [],
+    storagePath: '',
+    extensionPath: '',
+    asAbsolutePath: () => '',
+    workspaceState: null as any,
+  });
 });
 
 test('escapedKeyCodes', async () => {

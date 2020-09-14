@@ -1,5 +1,5 @@
-import { VimModule } from 'coc-helper';
-import { events } from 'coc.nvim';
+import { HelperEventEmitter, VimModule } from 'coc-helper';
+import { commands } from 'coc.nvim';
 import { KeyNames, nameToCode } from './escapeKeys';
 import { asyncCatch, onError } from './util';
 import { LiteralUnion } from 'type-fest';
@@ -51,7 +51,7 @@ export async function getcharStart<R = void>(
       disposable.dispose();
       resolve(result);
     };
-    const disposable = events.on('InputChar', (char, mode) => {
+    const disposable = getcharEvent.on('InputChar', (char, mode) => {
       onInputChar_({
         char,
         mode,
@@ -64,8 +64,25 @@ export async function getcharStart<R = void>(
   });
 }
 
+const getcharEvent = new HelperEventEmitter<{
+  InputChar: (ch: string, mode: CharMode) => void;
+}>(onError);
+
 export const getcharModule = VimModule.create('getchar', (m) => {
   const activated = m.var('activated', '0');
+
+  m.registerInit((context) => {
+    context.subscriptions.push(
+      commands.registerCommand(
+        'floatinput.inputchar',
+        (ch: string, mode: CharMode) => {
+          getcharEvent.fire('InputChar', ch, mode).catch(onError);
+        },
+        undefined,
+        true,
+      ),
+    );
+  });
 
   const getc = m.fn<[], string>(
     'getc',
@@ -97,7 +114,7 @@ export const getcharModule = VimModule.create('getchar', (m) => {
             if ch ==# "\\<FocusLost>" || ch ==# "\\<FocusGained>" || ch ==# "\\<CursorHold>"
               continue
             else
-              call coc#rpc#notify('InputChar', [ch, getcharmod()])
+              call CocActionAsync('runCommand', 'floatinput.inputchar', ch, getcharmod())
             endif
           endwhile
         endfunction

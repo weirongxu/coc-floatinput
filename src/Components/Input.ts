@@ -275,7 +275,7 @@ export abstract class Input<Value> extends BaseComponent<
     finalOptions.wins.input = {
       top: inputTop,
       width,
-      height: inputHeight,
+      height: inputHeight || 1,
       focus: true,
       modifiable: true,
       lines: inputLines,

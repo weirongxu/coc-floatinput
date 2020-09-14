@@ -74,11 +74,6 @@ export function columnsFlexLayout<C extends BaseColumn>(
   let curWidth = 0;
   let curColumns: C[] = [];
   for (const column of columns) {
-    if (curWidth >= maxWidth) {
-      lines.push(curColumns);
-      curColumns = [];
-      curWidth = 0;
-    }
     if (curColumns.length) {
       // delimiter
       column.width += 1;
@@ -86,6 +81,11 @@ export function columnsFlexLayout<C extends BaseColumn>(
     // add 2 spaces
     column.width += 2;
     curWidth += column.width;
+    if (curColumns.length && curWidth >= maxWidth) {
+      lines.push(curColumns);
+      curColumns = [];
+      curWidth = column.width;
+    }
     curColumns.push(column);
   }
   lines.push(curColumns);

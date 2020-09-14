@@ -12,7 +12,7 @@ import {
   VimCommandProvider,
 } from './ListProvider';
 import { registerRename } from './rename';
-import { asyncCatch, onError } from './util';
+import { onError } from './util';
 
 export const FloatInput = {
   components: {

@@ -13,7 +13,11 @@ export namespace FloatingUI {
   export const numberInput = numberInput_.input.bind(numberInput_);
   export const intInput = intInput_.input.bind(intInput_);
 
-  export const confirm = confirm_.input.bind(confirm_);
+  export function confirm<Value extends string = 'yes' | 'no'>(
+    options: Confirm.Options<Value>,
+  ) {
+    return (confirm_ as Confirm<Value>).input(options);
+  }
 
   // TODO
   // - select / search

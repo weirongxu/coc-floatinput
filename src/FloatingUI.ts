@@ -3,10 +3,6 @@ import { IntInput } from './Components/IntInput';
 import { NumberInput } from './Components/NumberInput';
 import { StringInput } from './Components/StringInput';
 
-export class FloatingUI {
-  async create() {}
-}
-
 const stringInput_ = new StringInput();
 const numberInput_ = new NumberInput();
 const intInput_ = new IntInput();

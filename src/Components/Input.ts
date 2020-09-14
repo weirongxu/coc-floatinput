@@ -2,7 +2,6 @@ import {
   displayHeight,
   FloatingWindow,
   MultiFloatingWindow,
-  sleep,
   versionName,
 } from 'coc-helper';
 import {
@@ -233,20 +232,19 @@ export abstract class Input<Value> extends BaseComponent<
       wins: {},
     };
     if (options.prompt) {
-      const promptHeight = await displayHeight(width, [options.prompt]);
+      const promptLines = options.prompt.split(/\r\n|[\n\r]/g);
+      const promptHeight = await displayHeight(width, promptLines);
       finalOptions.wins.prompt = {
         width,
         height: promptHeight,
         focusable: false,
-        lines: [options.prompt],
-        highlights: [
-          {
-            line: 0,
-            colStart: 0,
-            colEnd: -1,
-            hlGroup: 'Question',
-          },
-        ],
+        lines: promptLines,
+        highlights: promptLines.map((_, line) => ({
+          line,
+          colStart: 0,
+          colEnd: -1,
+          hlGroup: 'Question',
+        })),
       };
       inputTop = promptHeight;
     }

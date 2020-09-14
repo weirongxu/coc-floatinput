@@ -1,7 +1,12 @@
 import { genAsyncCatch, genOnError, sleep } from 'coc-helper';
-import { workspace, Document } from 'coc.nvim';
+import { Document, workspace } from 'coc.nvim';
+import Pkg from '../package.json';
 
 const outputChannel = workspace.createOutputChannel('coc-floatinput');
+
+export const version = Pkg.version;
+
+export const versionName = version.replace(/[.-]/g, '_');
 
 export const onError = genOnError(outputChannel);
 

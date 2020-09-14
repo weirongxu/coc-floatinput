@@ -1,8 +1,14 @@
-import { FloatingInput } from './FloatingInput';
-import { workspace, Document, languages, ExtensionContext } from 'coc.nvim';
+import {
+  workspace,
+  Document,
+  languages,
+  ExtensionContext,
+  commands,
+} from 'coc.nvim';
 import { Position } from 'vscode-languageserver-protocol';
-import { synchronizeDocument } from './util';
+import { onError, synchronizeDocument } from './util';
 import { CocSymbolProvider } from './ListProvider';
+import { StringInput } from './Components/StringInput';
 
 function hasProviderRename(doc: Document) {
   if (!languages.hasProvider('rename', doc.textDocument)) {
@@ -29,75 +35,93 @@ async function getPrepareRename(doc: Document, position: Position) {
 export async function registerRename(context: ExtensionContext) {
   const provider = new CocSymbolProvider();
 
-  await FloatingInput.create(
-    {
+  const input = new StringInput();
+
+  async function getCurrentWord(doc: Document) {
+    if (!hasProviderRename(doc)) {
+      return false;
+    }
+
+    const position = await workspace.getCursorPosition();
+
+    await synchronizeDocument(doc);
+
+    const prepare = await getPrepareRename(doc, position);
+    if (!prepare) {
+      return false;
+    }
+    const word =
+      'placeholder' in prepare
+        ? prepare.placeholder
+        : doc.textDocument.getText(prepare);
+    return word;
+  }
+
+  async function rename() {
+    // TODO debug
+    const doc = await workspace.document;
+    const word = await getCurrentWord(doc);
+
+    if (word === false) {
+      return;
+    }
+
+    provider.document = doc;
+
+    const result = await input.input({
       title: 'coc-rename',
-      relative: 'cursor-around',
       filetype: 'floatinput-coc-rename',
-      command: 'floatinput.rename',
-      plugmap: 'floatinput-rename',
-      optionsOnTrigger: async () => {
-        const doc = await workspace.document;
-        if (!hasProviderRename(doc)) {
-          return false;
-        }
-
-        const position = await workspace.getCursorPosition();
-
-        await synchronizeDocument(doc);
-
-        provider.document = doc;
-
-        const prepare = await getPrepareRename(doc, position);
-        if (!prepare) {
-          return false;
-        }
-        const word =
-          'placeholder' in prepare
-            ? prepare.placeholder
-            : doc.textDocument.getText(prepare);
-        return {
-          text: word,
-        };
-      },
+      relative: 'cursor-around',
+      defaultValue: word,
+      prompt: word + ' ->',
       completion: {
         short: 'C',
         provider,
       },
-      async onConfirmed(content) {
-        if (!content) {
-          // eslint-disable-next-line no-restricted-properties
-          workspace.showMessage('Empty name, canceled', 'warning');
-          return;
-        }
+    });
 
-        const doc = await workspace.document;
-        if (!hasProviderRename(doc)) {
-          return;
-        }
+    if (result !== undefined) {
+      if (!result) {
+        // eslint-disable-next-line no-restricted-properties
+        workspace.showMessage('Empty name, canceled', 'warning');
+        return;
+      }
 
-        const position = await workspace.getCursorPosition();
+      const doc = await workspace.document;
+      if (!hasProviderRename(doc)) {
+        return;
+      }
 
-        await synchronizeDocument(doc);
+      const position = await workspace.getCursorPosition();
 
-        const prepare = await getPrepareRename(doc, position);
-        if (!prepare) {
-          return;
-        }
+      await synchronizeDocument(doc);
 
-        const edit = await languages.provideRenameEdits(
-          doc.textDocument,
-          position,
-          content,
-        );
-        if (!edit) {
-          // eslint-disable-next-line no-restricted-properties
-          workspace.showMessage('Invalid position for rename', 'warning');
-          return;
-        }
-        await workspace.applyEdit(edit);
-      },
-    },
-    context.subscriptions,
+      const prepare = await getPrepareRename(doc, position);
+      if (!prepare) {
+        return;
+      }
+
+      const edit = await languages.provideRenameEdits(
+        doc.textDocument,
+        position,
+        result,
+      );
+      if (!edit) {
+        // eslint-disable-next-line no-restricted-properties
+        workspace.showMessage('Invalid position for rename', 'warning');
+        return;
+      }
+      await workspace.applyEdit(edit);
+    }
+  }
+
+  context.subscriptions.push(
+    input,
+    commands.registerCommand('floatinput.rename', () => {
+      rename().catch(onError);
+    }),
+    workspace.registerKeymap(['n', 'i'], 'floatinput-rename', () => {
+      rename().catch(onError);
+    }),
   );
 }

@@ -146,11 +146,11 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
 
           if (matchCode(['<Esc>', '<C-c>'])) {
             await stop();
-          } else if (matchCode(['h', '<Left>'])) {
+          } else if (matchCode(['k', '<Up>', 'h', '<Left>'])) {
             const idx = values.indexOf(this.value);
             this.value = values[(idx + values.length - 1) % values.length];
             await this.resize();
-          } else if (matchCode(['l', '<Right>'])) {
+          } else if (matchCode(['j', '<Down>', 'l', '<Right>'])) {
             const idx = values.indexOf(this.value);
             this.value = values[(idx + 1) % values.length];
             await this.resize();

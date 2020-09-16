@@ -1,4 +1,5 @@
-import { jestHelper, VimModule } from 'coc-helper';
+import { VimModule } from 'coc-helper';
+import { jestHelper } from 'coc-helper/JestHelper';
 import { workspace } from 'coc.nvim';
 import { escapedKeysModule } from './escapeKeys';
 

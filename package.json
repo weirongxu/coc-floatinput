@@ -5,7 +5,7 @@
   "author": "Weirong Xu <weirongxu.raidou@gmail.com>",
   "repository": "git@github.com:weirongxu/coc-floatinput.git",
   "license": "MIT",
-  "types": "lib/src/index.d.ts",
+  "types": "lib/index.d.ts",
   "main": "lib/index.js",
   "keywords": [
     "coc.nvim",

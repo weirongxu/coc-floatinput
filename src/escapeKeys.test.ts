@@ -1,7 +1,10 @@
 import { VimModule } from 'coc-helper';
 import { jestHelper } from 'coc-helper/JestHelper';
 import { workspace } from 'coc.nvim';
+import { attach } from '@chemzqm/neovim';
 import { escapedKeysModule } from './escapeKeys';
+import cp from 'child_process';
+import pathLib from 'path';
 
 jestHelper.boot();
 

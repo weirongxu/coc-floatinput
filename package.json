@@ -35,11 +35,11 @@
     "semi": true
   },
   "devDependencies": {
-    "@types/jest": "^26.0.13",
-    "@types/node": "^14.6.0",
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.10.3",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
-    "coc-helper": "^0.5.1",
+    "coc-helper": "^0.5.3",
     "coc.nvim": "^0.0.79",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",

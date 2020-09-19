@@ -126,7 +126,7 @@ export abstract class Input<Value> extends BaseComponent<
             openedInputs.push(it.input);
           }
         }
-        await Promise.all(openedInputs.map((input) => input.close()));
+        await Promise.all(openedInputs.map((input) => input.confirm('cancel')));
       }),
       events.on('BufWinLeave', async (bufnr) => {
         const it = Input.inputMap.get(bufnr);
@@ -134,6 +134,9 @@ export abstract class Input<Value> extends BaseComponent<
           return;
         }
         await it.inputWin.buffer.setOption('buftype', 'nofile');
+        if (await it.input.opened()) {
+          await it.input.confirm('cancel');
+        }
       }),
       events.on('TextChangedI', async (bufnr) => {
         const it = Input.inputMap.get(bufnr);
@@ -270,6 +273,8 @@ export abstract class Input<Value> extends BaseComponent<
       }
     }
 
+    const inputBufnr = instance.floatWinDict.input.bufnr;
+
     finalOptions.wins.input = {
       top: inputTop,
       width,
@@ -277,13 +282,13 @@ export abstract class Input<Value> extends BaseComponent<
       focus: true,
       modifiable: true,
       lines: inputLines,
-      initedExecute: (ctx) => `
-        call setbufvar(${ctx.bufnr}, '&buftype', '')
-        call setbufvar(${ctx.bufnr}, '&wrap', 1)
-        execute 'nmap <silent><buffer> <CR> :call CocAction("runCommand", "${Input.actionCmd}", "ok", ' . ${ctx.bufnr} . ', "n", "${targetMode}")<CR>'
-        execute 'imap <silent><buffer> <CR> <C-o>:call CocAction("runCommand", "${Input.actionCmd}", "ok", ' . ${ctx.bufnr} . ', "i", "${targetMode}")<CR>'
-        execute 'nmap <silent><buffer> <ESC> :call CocAction("runCommand", "${Input.actionCmd}", "cancel", ' . ${ctx.bufnr} . ', "n", "${targetMode}")<CR>'
-        execute 'imap <silent><buffer> <C-c> <C-o>:call CocAction("runCommand", "${Input.actionCmd}", "cancel", ' . ${ctx.bufnr} . ', "i", "${targetMode}")<CR>'
+      initedExecute: () => `
+        call setbufvar(${inputBufnr}, '&buftype', '')
+        call setbufvar(${inputBufnr}, '&wrap', 1)
+        nmap <silent><buffer> <CR> :call CocAction('runCommand', '${Input.actionCmd}', 'ok', ${inputBufnr}, 'n', '${targetMode}')<CR>
+        imap <silent><buffer> <CR> <C-o>:call CocAction('runCommand', '${Input.actionCmd}', 'ok', ${inputBufnr}, 'i', '${targetMode}')<CR>
+        nmap <silent><buffer> <ESC> :call CocAction('runCommand', '${Input.actionCmd}', 'cancel', ${inputBufnr}, 'n', '${targetMode}')<CR>
+        imap <silent><buffer> <C-c> <C-o>:call CocAction('runCommand', '${Input.actionCmd}', 'cancel', ${inputBufnr}, 'i', '${targetMode}')<CR>
         call feedkeys('A')
       `,
     };

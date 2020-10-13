@@ -1641,10 +1641,8 @@ co@^4.6.0:
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
   integrity sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=
 
-coc-helper@^0.5.3:
+coc-helper@../coc-helper:
   version "0.5.3"
-  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.5.3.tgz#3341552d004bf00245291d4c2ef7fad7969fa554"
-  integrity sha512-Skyg42uC9pc+WJcC2fPai9A6GNEjn13cPEpo7iFE9XI01X6sqkV//xgS2pWSX39rny7GCQI6/giFQD5FmMvfJQ==
   dependencies:
     app-root-path "^3.0.0"
 

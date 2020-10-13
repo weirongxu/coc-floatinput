@@ -58,7 +58,6 @@ export async function registerRename(context: ExtensionContext) {
   }
 
   async function rename() {
-    // TODO debug
     const doc = await workspace.document;
     const word = await getCurrentWord(doc);
 

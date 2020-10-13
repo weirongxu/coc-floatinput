@@ -5,6 +5,7 @@ import { Input } from './Components/Input';
 import { IntInput } from './Components/IntInput';
 import { NumberInput } from './Components/NumberInput';
 import { StringInput } from './Components/StringInput';
+import { vimEvents } from './events';
 import { FloatingUI } from './FloatingUI';
 import {
   CocCommandProvider,
@@ -12,7 +13,8 @@ import {
   VimCommandProvider,
 } from './ListProvider';
 import { registerRename } from './rename';
-import { onError } from './util';
+import { CocStatusManager } from './status';
+import { configLocal, onError } from './util';
 
 export const FloatInput = {
   components: {
@@ -106,6 +108,14 @@ export async function activate(
   );
 
   await registerRename(context);
+
+  await vimEvents.register(context);
+
+  const config = configLocal();
+  const cocStatusManager = await CocStatusManager.create(context, config);
+  if (config.get<boolean>('status.enabled')!) {
+    await cocStatusManager.enable();
+  }
 
   return FloatInput;
 }

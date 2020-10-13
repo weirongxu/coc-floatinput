@@ -20,6 +20,7 @@ export namespace FloatingUI {
   }
 
   // TODO
+  // Vim API
   // - select / search
   // - checkbox
 }

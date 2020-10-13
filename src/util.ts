@@ -1,4 +1,4 @@
-import { genAsyncCatch, genOnError, sleep } from 'coc-helper';
+import { getConfigLocal, genAsyncCatch, genOnError, sleep } from 'coc-helper';
 import { Document, workspace } from 'coc.nvim';
 
 const outputChannel = workspace.createOutputChannel('coc-floatinput');
@@ -14,3 +14,5 @@ export async function synchronizeDocument(doc: Document): Promise<void> {
     await sleep(50);
   }
 }
+
+export const configLocal = getConfigLocal('floatinput');

@@ -39,7 +39,7 @@
     "@types/node": "^14.10.3",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
-    "coc-helper": "^0.5.3",
+    "coc-helper": "../coc-helper",
     "coc.nvim": "^0.0.79",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",
@@ -64,10 +64,39 @@
       "type": "object",
       "title": "coc-floatinput configuration",
       "properties": {
-        "coc-floatinput.enabled": {
+        "floatinput.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable coc-floatinput extension"
+        },
+        "floatinput.status.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable coc-floatinput status window"
+        },
+        "floatinput.status.timeout": {
+          "type": "int",
+          "default": 1000,
+          "description": "floatinput status timeout in milliseconds"
+        },
+        "floatinput.status.width": {
+          "type": "int",
+          "default": 20,
+          "description": "floatinput status width"
+        },
+        "floatinput.status.direction": {
+          "default": "top-right",
+          "enum": [
+            "top-left",
+            "top-center",
+            "top-right",
+            "left-center",
+            "right-center",
+            "bottom-left",
+            "bottom-center",
+            "bottom-right"
+          ],
+          "description": "floatinput status position"
         }
       }
     },

@@ -16,6 +16,11 @@ Floating input for coc.nvim
 
 `nmap <silent> <Leader>rn <Plug>(coc-floatinput-rename)`
 
+### Screenshots
+
+<img src="https://user-images.githubusercontent.com/1709861/90628904-03ab2e80-e251-11ea-97c7-5eec56b7821f.png" width="400">
+<img src="https://user-images.githubusercontent.com/1709861/90628942-13c30e00-e251-11ea-81af-683363ae5370.png" width="400">
+
 ## Highlight
 
 ```vim
@@ -54,7 +59,7 @@ async function getFloatUI() {
 }
 ```
 
-#### stringInput
+#### string input
 
 ```typescript
 const FloatUI = await getFloatUI();
@@ -64,26 +69,32 @@ await FloatUI?.stringInput({
 });
 ```
 
-#### numberInput
+<img src="https://user-images.githubusercontent.com/1709861/96014948-8cbd9b00-0e79-11eb-8409-fbc31a0fcc76.png" width="300">
+
+#### number input
 
 ```typescript
 const FloatUI = await getFloatUI();
-await FloatUI?.stringInput({
+await FloatUI?.numberInput({
   prompt: 'Input your number',
   defaultValue: 1,
 });
 ```
 
+<img src="https://user-images.githubusercontent.com/1709861/96015085-bd9dd000-0e79-11eb-979d-b89480554fb2.png" width="300">
+
 #### confirm
 
-````typescript
+```typescript
 const FloatUI = await getFloatUI();
 await FloatUI?.confirm({
   prompt: 'Are you sure',
-  values: ['yes', 'no'],
+  values: ['yes', 'no', 'skip'],
   defaultValue: 'yes',
 });
 ```
+
+<img src="https://user-images.githubusercontent.com/1709861/96015199-defebc00-0e79-11eb-9a9c-18288fd34718.png" width="300">
 
 ## Status window
 
@@ -95,7 +106,7 @@ coc-settings.json
 {
   "floatinput.status.enabled": true
 }
-````
+```
 
 Avoid `only floating window` error
 
@@ -124,11 +135,6 @@ if has('nvim')
   nmap <silent> ZZ :call <SID>quit()<CR>
 endif
 ```
-
-## Screenshot
-
-![image](https://user-images.githubusercontent.com/1709861/90628942-13c30e00-e251-11ea-81af-683363ae5370.png)
-![image](https://user-images.githubusercontent.com/1709861/90628904-03ab2e80-e251-11ea-97c7-5eec56b7821f.png)
 
 ## License
 

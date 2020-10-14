@@ -24,9 +24,66 @@ autocmd ColorScheme *
       \ | hi CocHelperNormalFloat guibg=#575B54
 ```
 
-## FloatingUI API
+## API
 
-TODO API doc and screenshot
+Use coc-floatinput API in other extensions
+
+```typescript
+// Get coc-floatinput API
+import type { FloatInputType } from 'coc-floatinput';
+import { extensions } from 'coc.nvim';
+
+let floatInputApi: FloatInputType | undefined;
+
+async function getFloatInputApi() {
+  if (!floatInputApi) {
+    floatInputApi = extensions.getExtensionApi(
+      'coc-floatinput',
+    ) as FloatInputType;
+  }
+  return floatInputApi;
+}
+```
+
+### FloatingUI
+
+```typescript
+// Get FloatinUI
+async function getFloatUI() {
+  return (await getFloatInputApi())?.FloatingUI;
+}
+```
+
+#### stringInput
+
+```typescript
+const FloatUI = await getFloatUI();
+await FloatUI?.stringInput({
+  prompt: 'Input your string',
+  defaultValue: 'default string',
+});
+```
+
+#### numberInput
+
+```typescript
+const FloatUI = await getFloatUI();
+await FloatUI?.stringInput({
+  prompt: 'Input your number',
+  defaultValue: 1,
+});
+```
+
+#### confirm
+
+````typescript
+const FloatUI = await getFloatUI();
+await FloatUI?.confirm({
+  prompt: 'Are you sure',
+  values: ['yes', 'no'],
+  defaultValue: 'yes',
+});
+```
 
 ## Status window
 
@@ -38,7 +95,7 @@ coc-settings.json
 {
   "floatinput.status.enabled": true
 }
-```
+````
 
 Avoid `only floating window` error
 
@@ -67,10 +124,6 @@ if has('nvim')
   nmap <silent> ZZ :call <SID>quit()<CR>
 endif
 ```
-
-## Configurations
-
-TODO status
 
 ## Screenshot
 

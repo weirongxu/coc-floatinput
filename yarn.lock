@@ -1589,9 +1589,9 @@ co@^4.6.0:
   integrity sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=
 
 coc-helper@^0.6.0:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.6.1.tgz#e7e116fdf5b2c8d92b1fbdd56103d0c7d98633dd"
-  integrity sha512-CTSD2yRFKIBKS3+J+7V7b/xD8yrWFzmJ+q/cZRJvXy2EH4WKc28+3BbOlkkjMPpVN0SHOKkknUZBUM9AWhAaSw==
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.6.2.tgz#f7a2be0cc9e89092dc420721314672204b09cba0"
+  integrity sha512-cPKMOe06AvqQ/gq/llbhANhWr2q3LrcBU4+GVgYomjywUReaFNsN+zHa1bGjNN+YL+ju1NILJTyi4zdE9Wja9g==
   dependencies:
     app-root-path "^3.0.0"
 

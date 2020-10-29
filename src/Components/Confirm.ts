@@ -195,6 +195,7 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
       line.forEach((column) => {
         void instance.floatWinDict.btn.buffer.addHighlight({
           ...column,
+          srcId: 0,
           hlGroup: this.value === column.value ? 'PmenuSel' : 'None',
         });
       });

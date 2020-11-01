@@ -53,7 +53,7 @@ async function getFloatInputApi() {
 ### FloatingUI
 
 ```typescript
-// Get FloatinUI
+// Get FloatingUI
 async function getFloatUI() {
   return (await getFloatInputApi())?.FloatingUI;
 }

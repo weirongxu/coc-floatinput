@@ -122,7 +122,7 @@ if has('nvim')
     while nr > 0
       if !s:is_float(nr)
         if nr == 1
-          call coc#util#close_floats()
+          call coc#float#close_all()
           break
         endif
       endif

@@ -1,7 +1,7 @@
 import { getConfigLocal, genAsyncCatch, genOnError, sleep } from 'coc-helper';
 import { Document, workspace } from 'coc.nvim';
 
-const outputChannel = workspace.createOutputChannel('coc-floatinput');
+const outputChannel = workspace.createOutputChannel('floatinput');
 
 export const onError = genOnError(outputChannel);
 

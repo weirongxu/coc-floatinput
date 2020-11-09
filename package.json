@@ -1,6 +1,6 @@
 {
   "name": "coc-floatinput",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Floating input for coc.nvim",
   "author": "Weirong Xu <weirongxu.raidou@gmail.com>",
   "repository": "git@github.com:weirongxu/coc-floatinput.git",

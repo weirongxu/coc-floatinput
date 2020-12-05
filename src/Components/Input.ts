@@ -79,10 +79,10 @@ export abstract class Input<Value> extends BaseComponent<
     }
     if (targetMode === 'i') {
       if (mode === 'n') {
-        await workspace.nvim.command('call feedkeys("i", "n")');
+        await workspace.nvim.command('call feedkeys("a", "n")');
       }
     } else if (mode !== 'n') {
-      await workspace.nvim.command('call feedkeys("\\<ESC>", "n")');
+      await workspace.nvim.command('call feedkeys("\\<ESC>l", "n")');
     }
   }
 

@@ -59,13 +59,13 @@ export abstract class Input<Value> extends BaseComponent<
   > = new Map();
   protected static _inited = false;
 
-  protected abstract async defaultString(): Promise<string>;
+  protected abstract defaultString(): Promise<string>;
 
-  protected abstract async valueToString(value: Value): Promise<string>;
+  protected abstract valueToString(value: Value): Promise<string>;
 
-  protected abstract async stringToValue(str: string): Promise<Value>;
+  protected abstract stringToValue(str: string): Promise<Value>;
 
-  protected abstract async validateContent(str: string): Promise<boolean>;
+  protected abstract validateContent(str: string): Promise<boolean>;
 
   protected completionDisposable?: Disposable;
   protected id = 0;

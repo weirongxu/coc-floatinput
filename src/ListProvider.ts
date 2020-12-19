@@ -7,13 +7,13 @@ import {
 } from 'coc.nvim';
 import {
   Position,
-  TextDocument,
   Range,
   CompletionItem,
   CompletionItemKind,
   SymbolInformation,
   DocumentSymbol,
-} from 'vscode-languageserver-protocol';
+} from 'vscode-languageserver-types';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 type ListItem = { name: string; kind?: CompletionItemKind };
 

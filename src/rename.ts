@@ -32,36 +32,33 @@ async function getPrepareRename(doc: Document, position: Position) {
   return prepare;
 }
 
+async function getCurrentWord(doc: Document, position: Position) {
+  const prepare = await getPrepareRename(doc, position);
+  if (!prepare) {
+    return;
+  }
+  const word =
+    'placeholder' in prepare
+      ? prepare.placeholder
+      : doc.textDocument.getText(prepare);
+  return word;
+}
+
 export async function registerRename(context: ExtensionContext) {
   const provider = new CocSymbolProvider();
 
   const input = new StringInput();
 
-  async function getCurrentWord(doc: Document) {
+  async function rename() {
+    const doc = await workspace.document;
+    await synchronizeDocument(doc);
     if (!hasProviderRename(doc)) {
-      return false;
+      return;
     }
 
     const position = await workspace.getCursorPosition();
-
-    await synchronizeDocument(doc);
-
-    const prepare = await getPrepareRename(doc, position);
-    if (!prepare) {
-      return false;
-    }
-    const word =
-      'placeholder' in prepare
-        ? prepare.placeholder
-        : doc.textDocument.getText(prepare);
-    return word;
-  }
-
-  async function rename() {
-    const doc = await workspace.document;
-    const word = await getCurrentWord(doc);
-
-    if (word === false) {
+    const word = await getCurrentWord(doc, position);
+    if (!word) {
       return;
     }
 
@@ -83,20 +80,6 @@ export async function registerRename(context: ExtensionContext) {
       if (!result) {
         // eslint-disable-next-line no-restricted-properties
         workspace.showMessage('Empty name, canceled', 'warning');
-        return;
-      }
-
-      const doc = await workspace.document;
-      if (!hasProviderRename(doc)) {
-        return;
-      }
-
-      const position = await workspace.getCursorPosition();
-
-      await synchronizeDocument(doc);
-
-      const prepare = await getPrepareRename(doc, position);
-      if (!prepare) {
         return;
       }
 

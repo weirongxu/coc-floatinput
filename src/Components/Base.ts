@@ -1,10 +1,12 @@
-import { Disposable, disposeAll, Emitter } from 'coc.nvim';
+import { Disposable, disposeAll, Emitter, workspace } from 'coc.nvim';
 
 export abstract class BaseComponent<
   Instance,
   Options extends object,
   InputResult = void
 > implements Disposable {
+  static readonly srcId = workspace.createNameSpace('coc-floatinput');
+
   protected _inited = false;
   protected storeOptions?: Options;
   protected readonly disposables: Disposable[] = [];
@@ -33,18 +35,15 @@ export abstract class BaseComponent<
   async opened(): Promise<boolean> {
     return this._opened(await this.instance());
   }
-  protected abstract async _opened(instance: Instance): Promise<boolean>;
+  protected abstract _opened(instance: Instance): Promise<boolean>;
 
-  protected abstract async _create(): Promise<Instance>;
+  protected abstract _create(): Promise<Instance>;
 
   async open(options: Options) {
     this.storeOptions = options;
     return this._open(await this.instance(), options);
   }
-  protected abstract async _open(
-    instance: Instance,
-    options: Options,
-  ): Promise<void>;
+  protected abstract _open(instance: Instance, options: Options): Promise<void>;
 
   async resize() {
     if (!this.storeOptions) {
@@ -52,7 +51,7 @@ export abstract class BaseComponent<
     }
     return this._resize(await this.instance(), this.storeOptions);
   }
-  protected abstract async _resize(
+  protected abstract _resize(
     instance: Instance,
     options: Options,
   ): Promise<void>;
@@ -61,7 +60,7 @@ export abstract class BaseComponent<
     await this._close(await this.instance(), inputResult);
     this.closeEmitter.fire(inputResult);
   }
-  protected abstract async _close(
+  protected abstract _close(
     instance: Instance,
     inputResult?: InputResult,
   ): Promise<void>;

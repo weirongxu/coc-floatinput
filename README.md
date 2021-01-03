@@ -124,6 +124,8 @@ if has('nvim')
         if nr == 1
           call coc#float#close_all()
           break
+        else
+          break
         endif
       endif
       let nr -= 1

@@ -4,13 +4,11 @@ import {
   commands,
   Document,
   CompletionItem,
-} from 'coc.nvim';
-import {
   Position,
   Range,
   CompletionItemKind,
-} from 'vscode-languageserver-types';
-import { TextDocument } from 'vscode-languageserver-textdocument';
+  TextDocument,
+} from 'coc.nvim';
 
 type ListItem = { name: string; kind?: CompletionItemKind };
 

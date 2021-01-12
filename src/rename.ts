@@ -5,8 +5,8 @@ import {
   ExtensionContext,
   commands,
   window,
+  Position,
 } from 'coc.nvim';
-import { Position } from 'vscode-languageserver-protocol';
 import { logger, synchronizeDocument } from './util';
 import { CocSymbolProvider } from './ListProvider';
 import { StringInput } from './Components/StringInput';

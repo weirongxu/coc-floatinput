@@ -275,6 +275,7 @@ export abstract class Input<Value> extends BaseComponent<
     }
 
     const inputBufnr = instance.floatWinDict.input.bufnr;
+    const filetype = options.filetype ?? this.genFiletype();
 
     finalOptions.wins.input = {
       top: inputTop,
@@ -283,6 +284,7 @@ export abstract class Input<Value> extends BaseComponent<
       focus: true,
       modifiable: true,
       lines: inputLines,
+      filetype,
       initedExecute: () => `
         call setbufvar(${inputBufnr}, '&buftype', '')
         call setbufvar(${inputBufnr}, '&wrap', 1)
@@ -298,7 +300,6 @@ export abstract class Input<Value> extends BaseComponent<
       if (this.completionDisposable) {
         this.completionDisposable.dispose();
       }
-      const filetype = options.filetype ?? this.genFiletype();
       this.completionDisposable = languages.registerCompletionItemProvider(
         filetype,
         options.completion.short,

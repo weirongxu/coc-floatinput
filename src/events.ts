@@ -1,5 +1,5 @@
 import { HelperVimEvents } from 'coc-helper';
-import { onError } from './util';
+import { logger } from './util';
 
 export const vimEvents = new HelperVimEvents<{
   CocStatusChange: () => void;
@@ -9,7 +9,7 @@ export const vimEvents = new HelperVimEvents<{
       eventExpr: 'User CocStatusChange',
     },
   },
-  onError,
+  logger,
   {
     name: 'FloatinputStatus',
   },

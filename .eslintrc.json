@@ -41,10 +41,13 @@
     "no-restricted-properties": [
       "error",
       {
-        "object": "workspace",
+        "object": "window",
         "property": "showMessage"
       }
     ],
-    "no-restricted-imports": ["error", { "name": "lodash", "message": "Please use lodash-es instead" }]
+    "no-restricted-imports": [
+      "error",
+      { "name": "lodash", "message": "Please use lodash-es instead" }
+    ]
   }
 }

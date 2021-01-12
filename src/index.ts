@@ -1,5 +1,5 @@
 import { activateHelper } from 'coc-helper';
-import { commands, ExtensionContext, workspace } from 'coc.nvim';
+import { commands, ExtensionContext, window, workspace } from 'coc.nvim';
 import { Confirm } from './Components/Confirm';
 import { Input } from './Components/Input';
 import { IntInput } from './Components/IntInput';
@@ -14,7 +14,7 @@ import {
 } from './ListProvider';
 import { registerRename } from './rename';
 import { CocStatusManager } from './status';
-import { configLocal, onError } from './util';
+import { configLocal, logger } from './util';
 
 export const FloatInput = {
   components: {
@@ -35,7 +35,7 @@ export async function activate(
 ): Promise<FloatInputType> {
   if (workspace.isVim) {
     // eslint-disable-next-line no-restricted-properties
-    workspace.showMessage('coc-floatinput only support neovim', 'warning');
+    window.showMessage('coc-floatinput only support neovim', 'warning');
     return;
   }
 
@@ -70,10 +70,10 @@ export async function activate(
   subscriptions.push(
     input,
     commands.registerCommand('floatinput.command', () => {
-      vimCommand().catch(onError);
+      vimCommand().catch(logger.error);
     }),
     workspace.registerKeymap(['n', 'i'], 'floatinput-command', () => {
-      vimCommand().catch(onError);
+      vimCommand().catch(logger.error);
     }),
   );
 
@@ -100,10 +100,10 @@ export async function activate(
   subscriptions.push(
     input,
     commands.registerCommand('floatinput.coc.command', () => {
-      cocCommand().catch(onError);
+      cocCommand().catch(logger.error);
     }),
     workspace.registerKeymap(['n', 'i'], 'floatinput-coc-command', () => {
-      cocCommand().catch(onError);
+      cocCommand().catch(logger.error);
     }),
   );
 

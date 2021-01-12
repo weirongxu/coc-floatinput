@@ -224,7 +224,7 @@ export abstract class Input<Value> extends BaseComponent<
     type: 'open' | 'resize',
     mode: MapMode = 'n',
   ): Promise<MultiFloatingWindow.OpenOptions> {
-    const targetMode = workspace.env.mode as MapMode;
+    const targetMode = (await workspace.nvim.mode).mode as MapMode;
 
     const width = options.width ?? 30;
     let inputTop = 0;
@@ -242,10 +242,11 @@ export abstract class Input<Value> extends BaseComponent<
         height: promptHeight,
         focusable: false,
         lines: promptLines,
-        highlights: promptLines.map((_, line) => ({
+        highlights: promptLines.map((prompt, line) => ({
+          srcId: this.srcId,
           line,
           colStart: 0,
-          colEnd: -1,
+          colEnd: prompt.length,
           hlGroup: 'Question',
         })),
       };

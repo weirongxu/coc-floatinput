@@ -4,10 +4,10 @@ import {
   MultiFloatingWindow,
   versionName,
 } from 'coc-helper';
-import { workspace } from 'coc.nvim';
+import { workspace, Range, Position } from 'coc.nvim';
 import { ColumnLayout, columnsFlexLayout } from '../column-flex-layout';
 import { CharMode, getcharStart } from '../getchar';
-import { onError } from '../util';
+import { logger } from '../util';
 import { BaseComponent } from './Base';
 
 export namespace Confirm {
@@ -92,12 +92,13 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
       finalOptions.wins.prompt = {
         width,
         height: promptHeight,
-        focusable: false,
+        focusable: true,
         lines: promptLines,
-        highlights: promptLines.map((_, line) => ({
+        highlights: promptLines.map((prompt, line) => ({
+          srcId: this.srcId,
           line,
           colStart: 0,
-          colEnd: -1,
+          colEnd: prompt.length,
           hlGroup: 'Question',
         })),
       };
@@ -190,14 +191,19 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
 
   protected async updateHighlights(instance: Instance) {
     workspace.nvim.pauseNotification();
-    instance.floatWinDict.btn.buffer.clearHighlight();
+    instance.floatWinDict.btn.buffer.clearNamespace(this.srcId);
     this.btnLinesLayout?.forEach((line) => {
       line.forEach((column) => {
-        void instance.floatWinDict.btn.buffer.addHighlight({
-          ...column,
-          srcId: BaseComponent.srcId,
-          hlGroup: this.value === column.value ? 'PmenuSel' : 'None',
-        });
+        instance.floatWinDict.btn.buffer.highlightRanges(
+          this.srcId,
+          this.value === column.value ? 'PmenuSel' : 'None',
+          [
+            Range.create(
+              Position.create(column.line, column.colStart),
+              Position.create(column.line, column.colEnd),
+            ),
+          ],
+        );
       });
     });
     workspace.nvim.command('redraw!', true);
@@ -209,7 +215,7 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
     this.value = options.defaultValue ?? values[values.length - 1];
     await instance.open(await this.getFinalOpenOptions(options));
     await this.updateHighlights(instance);
-    this.waitUserInput(instance, values).catch(onError);
+    this.waitUserInput(instance, values).catch(logger.error);
   }
 
   protected async _resize(instance: Instance, options: Confirm.Options<Value>) {

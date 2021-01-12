@@ -12,6 +12,10 @@ export abstract class BaseComponent<
   protected readonly disposables: Disposable[] = [];
   protected readonly closeEmitter = new Emitter<InputResult | undefined>();
 
+  get srcId() {
+    return BaseComponent.srcId;
+  }
+
   dispose() {
     disposeAll(this.disposables);
   }

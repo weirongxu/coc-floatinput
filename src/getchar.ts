@@ -1,7 +1,7 @@
 import { HelperEventEmitter, VimModule } from 'coc-helper';
 import { commands } from 'coc.nvim';
 import { KeyNames, nameToCode } from './escapeKeys';
-import { asyncCatch, onError } from './util';
+import { logger } from './util';
 import { LiteralUnion } from 'type-fest';
 
 export enum CharMode {
@@ -36,8 +36,8 @@ export async function getcharStart<R = void>(
   }) => unknown,
 ): Promise<R | undefined> {
   const codes = await nameToCode();
-  getcharModule.startPrompt.call().catch(onError);
-  const onInputChar_: typeof onInputChar = asyncCatch(onInputChar);
+  getcharModule.startPrompt.call().catch(logger.error);
+  const onInputChar_: typeof onInputChar = logger.asyncCatch(onInputChar);
   const matchCodeWith = (
     char: string,
     names: LiteralUnion<KeyNames, string>[],
@@ -66,7 +66,7 @@ export async function getcharStart<R = void>(
 
 const getcharEvent = new HelperEventEmitter<{
   InputChar: (ch: string, mode: CharMode) => void;
-}>(onError);
+}>(logger);
 
 export const getcharModule = VimModule.create('getchar', (m) => {
   const activated = m.var('activated', '0');
@@ -76,7 +76,7 @@ export const getcharModule = VimModule.create('getchar', (m) => {
       commands.registerCommand(
         'floatinput.inputchar',
         (ch: string, mode: CharMode) => {
-          getcharEvent.fire('InputChar', ch, mode).catch(onError);
+          getcharEvent.fire('InputChar', ch, mode).catch(logger.error);
         },
         undefined,
         true,

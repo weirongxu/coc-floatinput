@@ -1,4 +1,7 @@
+import { jestHelper } from 'coc-helper/JestHelper';
 import { NumberInput } from './NumberInput';
+
+jestHelper.boot();
 
 test('NumberInput.validateContent', async () => {
   // @ts-expect-error

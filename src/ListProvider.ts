@@ -2,20 +2,29 @@ import {
   CompletionItemProvider,
   workspace,
   commands,
-  languages,
   Document,
+  CompletionItem,
 } from 'coc.nvim';
 import {
   Position,
   Range,
-  CompletionItem,
   CompletionItemKind,
-  SymbolInformation,
-  DocumentSymbol,
 } from 'vscode-languageserver-types';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 type ListItem = { name: string; kind?: CompletionItemKind };
+
+interface SymbolInfo {
+  filepath?: string;
+  lnum: number;
+  col: number;
+  text: string;
+  kind: string;
+  level?: number;
+  containerName?: string;
+  range: Range;
+  selectionRange?: Range;
+}
 
 export abstract class ListProvider implements CompletionItemProvider {
   abstract getList(prefix: string): Promise<ListItem[]>;
@@ -65,11 +74,11 @@ export class CocSymbolProvider extends ListProvider {
 
   async getList(prefix: string): Promise<ListItem[]> {
     if (this.document) {
-      const symbols = (await languages.getDocumentSymbol(
-        this.document.textDocument,
-      )) as (SymbolInformation | DocumentSymbol)[];
+      const symbols = (await workspace.nvim.request('documentSymbols', [
+        this.document.bufnr,
+      ])) as SymbolInfo[];
       return symbols
-        .map((s) => ({ name: s.name }))
+        .map((s) => ({ name: s.text }))
         .filter((s) => s.name.startsWith(prefix));
     }
     return [];

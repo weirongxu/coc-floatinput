@@ -38,15 +38,15 @@ Use coc-floatinput API in other extensions
 import type { FloatInputType } from 'coc-floatinput';
 import { extensions } from 'coc.nvim';
 
-let floatInputApi: FloatInputType | undefined;
+let floatInputExt: FloatInputType | undefined;
 
 async function getFloatInputApi() {
   if (!floatInputApi) {
-    floatInputApi = extensions.getExtensionApi(
-      'coc-floatinput',
-    ) as FloatInputType;
+    floatInputExt = extensions.all.find((e) => e.id === 'coc-floatinput') as
+      | Extension<FloatInputType>
+      | undefined;
   }
-  return floatInputApi;
+  return floatInputExt?.exports;
 }
 ```
 
@@ -122,11 +122,9 @@ if has('nvim')
     while nr > 0
       if !s:is_float(nr)
         if nr == 1
-          call coc#float#close_all()
-          break
-        else
-          break
+          only
         endif
+        break
       endif
       let nr -= 1
     endwhile

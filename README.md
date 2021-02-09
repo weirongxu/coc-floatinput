@@ -112,27 +112,30 @@ Avoid `only floating window` error
 
 ```vim
 if has('nvim')
-  function! s:is_float(winnr) abort
+  function! s:is_float(winnr)
     let winid = win_getid(a:winnr)
     return !empty(nvim_win_get_config(winid)['relative'])
   endfunction
 
-  function s:quit()
-    let nr = winnr('$')
-    while nr > 0
-      if !s:is_float(nr)
-        if nr == 1
-          only
-        endif
+  function! s:quit_pre()
+    let cur_nr = winnr()
+    if s:is_float(cur_nr)
+      return
+    endif
+    let last_nr = winnr('$')
+    for nr in range(last_nr, 1, -1)
+      if s:is_float(nr)
+        continue
+      endif
+      if nr == 1
+        only
+      else
         break
       endif
-      let nr -= 1
-    endwhile
-    :quit
+    endfor
   endfunction
 
-  nmap <silent> <c-w>q :call <SID>quit()<CR>
-  nmap <silent> ZZ :call <SID>quit()<CR>
+  autocmd QuitPre * call <SID>quit_pre()
 endif
 ```
 

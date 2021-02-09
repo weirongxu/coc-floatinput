@@ -41,7 +41,7 @@ import { extensions } from 'coc.nvim';
 let floatInputExt: FloatInputType | undefined;
 
 async function getFloatInputApi() {
-  if (!floatInputApi) {
+  if (!floatInputExt) {
     floatInputExt = extensions.all.find((e) => e.id === 'coc-floatinput') as
       | Extension<FloatInputType>
       | undefined;

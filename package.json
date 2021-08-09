@@ -22,9 +22,9 @@
   "scripts": {
     "clean": "rimraf lib",
     "dev": "node watch.js",
-    "build:check-type": "tsc --noEmit",
+    "build:type": "tsc --emitDeclarationOnly",
     "build:pack": "node build.js",
-    "build": "run-s build:check-type build:pack",
+    "build": "run-s build:type build:pack",
     "prepare": "npm-run-all clean build",
     "lint": "eslint src --ext js,ts",
     "unittest": "jest --runInBand --detectOpenHandles --forceExit",

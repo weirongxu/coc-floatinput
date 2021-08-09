@@ -41,9 +41,7 @@ export async function activate(
 
   const { subscriptions } = context;
 
-  await activateHelper(context, {
-    events: true,
-  });
+  await activateHelper(context);
 
   const input = new StringInput();
 

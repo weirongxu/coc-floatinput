@@ -11,6 +11,6 @@ export const vimEvents = new HelperVimEvents<{
   },
   logger,
   {
-    name: 'FloatinputStatus',
+    name: 'Floatinput',
   },
 );

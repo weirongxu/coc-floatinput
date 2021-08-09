@@ -71,7 +71,7 @@ const getcharEvent = new HelperEventEmitter<{
 export const getcharModule = VimModule.create('getchar', (m) => {
   const activated = m.var('activated', '0');
 
-  m.registerInit((context) => {
+  m.registerInit('register getchar', (context) => {
     context.subscriptions.push(
       commands.registerCommand(
         'floatinput.inputchar',

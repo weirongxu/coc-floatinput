@@ -2,7 +2,7 @@
 
 Floating input for coc.nvim
 
-**Node**: Vim popupwin doesn't support the focus feature, So this extension only works on neovim
+**Note**: Vim popupwin doesn't support the focus feature, So this extension only works on neovim
 
 ## Install
 

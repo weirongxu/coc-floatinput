@@ -95,7 +95,6 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
         focusable: true,
         lines: promptLines,
         highlights: promptLines.map((prompt, line) => ({
-          srcId: this.srcId,
           line,
           colStart: 0,
           colEnd: prompt.length,
@@ -155,13 +154,10 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
             this.value = values[(idx + 1) % values.length];
             await this.resize();
           } else if (matchCode(['<LeftMouse>'])) {
-            const [
-              mouseWinid,
-              mouseLnum,
-              mouseCol,
-            ] = (await workspace.nvim.eval(
-              '[v:mouse_winid, v:mouse_lnum, v:mouse_col]',
-            )) as [number, number, number];
+            const [mouseWinid, mouseLnum, mouseCol] =
+              (await workspace.nvim.eval(
+                '[v:mouse_winid, v:mouse_lnum, v:mouse_col]',
+              )) as [number, number, number];
             if (mouseWinid === btn.id && this.btnLinesLayout) {
               const column = this.btnLinesLayout[mouseLnum - 1].find(
                 (c) => c.colStart <= mouseCol && mouseCol < c.colEnd,

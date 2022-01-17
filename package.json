@@ -114,7 +114,7 @@
     ]
   },
   "dependencies": {
-    "coc-helper": "^0.11.1",
+    "coc-helper": "^0.13.0",
     "esbuild": "^0.12.19"
   }
 }

@@ -243,7 +243,6 @@ export abstract class Input<Value> extends BaseComponent<
         focusable: false,
         lines: promptLines,
         highlights: promptLines.map((prompt, line) => ({
-          srcId: this.srcId,
           line,
           colStart: 0,
           colEnd: prompt.length,

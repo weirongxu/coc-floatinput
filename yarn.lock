@@ -1281,10 +1281,10 @@ co@^4.6.0:
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
   integrity sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=
 
-coc-helper@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.11.1.tgz#efc66be48af8b5d2d26dc16c0ed798118c884ca7"
-  integrity sha512-VygnmN65zqtw/4nwzthjwqjOsydsx7sXocLtwlm4uFxgoMJ63BwFLx3ekP0OSj6kQcEWqKOXC9In7w628pOd/Q==
+coc-helper@^0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/coc-helper/-/coc-helper-0.13.0.tgz#fcd3a1012557bb84db5287c1114ee6cab39ef0ea"
+  integrity sha512-MEYtyc803qSQo1ptQQgC4DMCTtHFqjQYiFOU4vRcg6A6FVeXvYYDLeLQhjqiBwsE+VjRaM/vpPXVFA5tJyVWQg==
   dependencies:
     rimraf "^3.0.2"
     uuid "^8.3.2"

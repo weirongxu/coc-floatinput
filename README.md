@@ -35,7 +35,10 @@ Use coc-floatinput API in other extensions
 
 ```typescript
 // Get coc-floatinput API
+
+// input FloatInputType only
 import type { FloatInputType } from 'coc-floatinput';
+
 import { extensions } from 'coc.nvim';
 
 let floatInputExt: FloatInputType | undefined;

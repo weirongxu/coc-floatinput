@@ -5,7 +5,7 @@ export abstract class BaseComponent<
   Options extends object,
   InputResult = void
 > implements Disposable {
-  static readonly srcId = workspace.createNameSpace('coc-floatinput');
+  static readonly srcId = 'coc-floatinput';
 
   protected _inited = false;
   protected storeOptions?: Options;

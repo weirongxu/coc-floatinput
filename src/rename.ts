@@ -68,7 +68,7 @@ export async function registerRename(context: ExtensionContext) {
 
     const result = await input.input({
       title: 'coc-rename',
-      filetype: 'floatinput-coc-rename',
+      filetype: 'floatinput_coc_rename',
       relative: 'cursor-around',
       defaultValue: word,
       prompt: word + ' ->',

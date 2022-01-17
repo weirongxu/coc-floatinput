@@ -52,7 +52,7 @@ export async function activate(
     const content = await input.input({
       title: 'command',
       relative: 'center',
-      filetype: 'floatinput-command',
+      filetype: 'floatinput_command',
       completion: {
         short: 'C',
         provider: new VimCommandProvider(),
@@ -82,7 +82,7 @@ export async function activate(
     const content = await input.input({
       title: 'coc-command',
       relative: 'center',
-      filetype: 'floatinput-coc-command',
+      filetype: 'floatinput_coc_command',
       completion: {
         short: 'C',
         provider: new CocCommandProvider(),

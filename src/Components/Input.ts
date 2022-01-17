@@ -70,7 +70,7 @@ export abstract class Input<Value> extends BaseComponent<
   protected completionDisposable?: Disposable;
   protected id = 0;
   protected genFiletype() {
-    return 'coc-floatinput-input-' + this.id;
+    return 'coc_floatinput_input_' + this.id;
   }
 
   protected async changeMode(mode: MapMode, targetMode: MapMode) {

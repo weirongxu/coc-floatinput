@@ -72,7 +72,8 @@ export class CocSymbolProvider extends ListProvider {
 
   async getList(prefix: string): Promise<ListItem[]> {
     if (this.document) {
-      const symbols = (await workspace.nvim.request('documentSymbols', [
+      const symbols = (await workspace.nvim.call('CocAction', [
+        'documentSymbols',
         this.document.bufnr,
       ])) as SymbolInfo[];
       return symbols

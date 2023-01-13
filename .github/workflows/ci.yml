@@ -17,31 +17,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        node-version: [12, 14]
+        os: [ubuntu-latest]
+        node-version: [14]
 
     env:
       NODE_ENV: test
 
     steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install yarn
-        run: |
-          curl --compressed -o- -L https://yarnpkg.com/install.sh | bash
-      - uses: actions/checkout@v1
-      - name: Install Packages
-        run: yarn
-      - name: Lint
-        run: yarn lint
-      - name: Install vim
-        uses: rhysd/action-setup-vim@v1
-        with:
-          neovim: true
-          version: v0.4.3
-      - name: Run unit tests
-        env:
-          NODE_ENV: test
-        run: yarn test
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn lint

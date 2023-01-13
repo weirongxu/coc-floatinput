@@ -17,7 +17,8 @@
     "coc": "^0.0.77"
   },
   "files": [
-    "lib"
+    "lib",
+    "autoload"
   ],
   "scripts": {
     "clean": "rimraf lib",

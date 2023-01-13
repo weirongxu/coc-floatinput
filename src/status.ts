@@ -1,13 +1,12 @@
 import { displayHeight, FloatingWindow } from 'coc-helper';
-import {
+import type {
   Disposable,
-  disposeAll,
   ExtensionContext,
-  workspace,
   WorkspaceConfiguration,
 } from 'coc.nvim';
-import { vimEvents } from './events';
-import { configLocal } from './util';
+import { disposeAll, workspace } from 'coc.nvim';
+import { events } from './events';
+import { configLocal, logger } from './util';
 
 type WinDirection =
   | 'top-left'
@@ -40,7 +39,7 @@ async function getWinDimension(
   const columns = workspace.env.columns;
   const topPos =
     showtabline === 0 ? 0 : showtabline === 2 || tabsCount > 1 ? 1 : 0;
-  let left: number = 0;
+  let left = 0;
   let top: number = topPos;
   if (direction === 'top-left') {
     top = topPos;
@@ -74,7 +73,7 @@ export class CocStatusManager implements Disposable {
   static async create(
     context: ExtensionContext,
     config: WorkspaceConfiguration,
-  ) {
+  ): Promise<CocStatusManager> {
     const disposables: Disposable[] = [];
     return new CocStatusManager(context, config, disposables);
   }
@@ -85,12 +84,12 @@ export class CocStatusManager implements Disposable {
     protected disposables: Disposable[] = [],
   ) {}
 
-  dispose() {
+  dispose(): void {
     disposeAll(this.disposables);
   }
 
   protected _floatWin?: FloatingWindow;
-  protected async floatWin() {
+  protected async floatWin(): Promise<FloatingWindow> {
     if (!this._floatWin) {
       this._floatWin = await FloatingWindow.create({
         mode: 'show',
@@ -101,7 +100,7 @@ export class CocStatusManager implements Disposable {
 
   protected autoCloseTimer?: NodeJS.Timeout;
 
-  public async show() {
+  public async show(): Promise<void> {
     const status = (await workspace.nvim.getVar('coc_status')) as string;
     if (!status) {
       return;
@@ -133,24 +132,24 @@ export class CocStatusManager implements Disposable {
       clearTimeout(this.autoCloseTimer);
     }
 
-    this.autoCloseTimer = setTimeout(async () => {
-      await this.hide();
+    this.autoCloseTimer = setTimeout(() => {
+      this.hide().catch(logger.error);
     }, timeout);
   }
 
-  public async hide() {
+  public async hide(): Promise<void> {
     await this._floatWin?.close();
   }
 
-  public async enable() {
+  public async enable(): Promise<void> {
     this.config = configLocal();
 
     this.disposables.push(
-      vimEvents.events.on('CocStatusChange', async () => {
-        await this.show();
+      events.on('CocStatusChange', () => {
+        this.show().catch(logger.error);
       }),
     );
   }
 
-  public async disable() {}
+  public async disable(): Promise<void> {}
 }

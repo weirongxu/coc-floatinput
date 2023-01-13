@@ -1,11 +1,12 @@
-import { activateHelper } from 'coc-helper';
-import { commands, ExtensionContext, window, workspace } from 'coc.nvim';
+import { activateHelper, registerRuntimepath } from 'coc-helper';
+import type { ExtensionContext } from 'coc.nvim';
+import { commands, window, workspace } from 'coc.nvim';
 import { Confirm } from './Components/Confirm';
 import { Input } from './Components/Input';
 import { IntInput } from './Components/IntInput';
 import { NumberInput } from './Components/NumberInput';
 import { StringInput } from './Components/StringInput';
-import { vimEvents } from './events';
+import { registerEvents } from './events';
 import { FloatingUI } from './FloatingUI';
 import {
   CocCommandProvider,
@@ -106,8 +107,8 @@ export async function activate(
   );
 
   await registerRename(context);
-
-  await vimEvents.register(context);
+  registerEvents(context);
+  await registerRuntimepath(context);
 
   const config = configLocal();
   const cocStatusManager = await CocStatusManager.create(context, config);

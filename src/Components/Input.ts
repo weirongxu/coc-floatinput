@@ -1,18 +1,8 @@
-import {
-  displayHeight,
-  FloatingWindow,
-  MultiFloatingWindow,
-  versionName,
-} from 'coc-helper';
-import {
-  commands,
-  CompletionItemProvider,
-  Disposable,
-  events,
-  languages,
-  MapMode,
-  workspace,
-} from 'coc.nvim';
+import type { FloatingWindow } from 'coc-helper';
+import { displayHeight, MultiFloatingWindow, versionName } from 'coc-helper';
+import type { CompletionItemProvider, MapMode } from 'coc.nvim';
+import { commands, Disposable, events, languages, workspace } from 'coc.nvim';
+import { logger } from '../util';
 import { BaseComponent } from './Base';
 
 export namespace Input {
@@ -48,7 +38,7 @@ export abstract class Input<Value> extends BaseComponent<
   Value
 > {
   protected static maxId = 0;
-  protected static actionCmd = 'floatinput.input.action_' + versionName;
+  protected static actionCmd = `floatinput.input.action_${versionName}`;
   protected static inputMap: Map<
     number,
     {
@@ -69,11 +59,14 @@ export abstract class Input<Value> extends BaseComponent<
 
   protected completionDisposable?: Disposable;
   protected id = 0;
-  protected genFiletype() {
-    return 'coc_floatinput_input_' + this.id;
+  protected genFiletype(): string {
+    return `coc_floatinput_input_${this.id}`;
   }
 
-  protected async changeMode(mode: MapMode, targetMode: MapMode) {
+  protected async changeMode(
+    mode: MapMode,
+    targetMode: MapMode,
+  ): Promise<void> {
     if (mode === targetMode) {
       return;
     }
@@ -86,7 +79,7 @@ export abstract class Input<Value> extends BaseComponent<
     }
   }
 
-  protected async getContent() {
+  protected async getContent(): Promise<string> {
     const instance = await this.instance();
     const buf = instance.floatWinDict.input.buffer;
     const lines = await buf.getLines({
@@ -97,7 +90,7 @@ export abstract class Input<Value> extends BaseComponent<
     return lines[0];
   }
 
-  protected async confirm(type: 'cancel' | 'ok') {
+  protected async confirm(type: 'cancel' | 'ok'): Promise<void> {
     if (type === 'cancel') {
       await this.close();
     } else if (type === 'ok') {
@@ -108,7 +101,7 @@ export abstract class Input<Value> extends BaseComponent<
     }
   }
 
-  protected _init() {
+  protected _init(): void {
     if (Input._inited) {
       return;
     }
@@ -154,19 +147,21 @@ export abstract class Input<Value> extends BaseComponent<
       }),
       commands.registerCommand(
         Input.actionCmd,
-        async (
-          type: 'cancel' | 'ok',
-          bufnr: number,
-          mode: MapMode,
-          targetMode: MapMode,
-        ) => {
-          const it = Input.inputMap.get(bufnr);
-          if (!it) {
-            return;
-          }
-          await it.input.changeMode(mode, targetMode);
-          await it.input.confirm(type);
-        },
+        logger.asyncCatch(
+          async (
+            type: 'cancel' | 'ok',
+            bufnr: number,
+            mode: MapMode,
+            targetMode: MapMode,
+          ) => {
+            const it = Input.inputMap.get(bufnr);
+            if (!it) {
+              return;
+            }
+            await it.input.changeMode(mode, targetMode);
+            await it.input.confirm(type);
+          },
+        ),
         undefined,
         true,
       ),
@@ -203,7 +198,7 @@ export abstract class Input<Value> extends BaseComponent<
     return instance.opened();
   }
 
-  async textChange(mode: MapMode) {
+  async textChange(mode: MapMode): Promise<void> {
     if (!this.storeOptions) {
       return;
     }
@@ -310,19 +305,25 @@ export abstract class Input<Value> extends BaseComponent<
     return finalOptions;
   }
 
-  protected async _open(instance: Instance, options: Input.Options<Value>) {
+  protected async _open(
+    instance: Instance,
+    options: Input.Options<Value>,
+  ): Promise<void> {
     await instance.open(
       await this.getFinalOpenOptions(options, instance, 'open'),
     );
   }
 
-  protected async _resize(instance: Instance, options: Input.Options<Value>) {
+  protected async _resize(
+    instance: Instance,
+    options: Input.Options<Value>,
+  ): Promise<void> {
     await instance.resize(
       await this.getFinalOpenOptions(options, instance, 'resize'),
     );
   }
 
-  protected async _close(instance: Instance) {
+  protected async _close(instance: Instance): Promise<void> {
     await instance.close();
   }
 }

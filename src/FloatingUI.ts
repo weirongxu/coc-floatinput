@@ -15,7 +15,7 @@ export namespace FloatingUI {
 
   export function confirm<Value extends string = 'yes' | 'no'>(
     options: Confirm.Options<Value>,
-  ) {
+  ): Promise<Value | undefined> {
     return (confirm_ as Confirm<Value>).input(options);
   }
 

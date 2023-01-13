@@ -5,7 +5,8 @@ import {
   versionName,
 } from 'coc-helper';
 import { workspace, Range, Position } from 'coc.nvim';
-import { ColumnLayout, columnsFlexLayout } from '../column-flex-layout';
+import type { ColumnLayout } from '../column-flex-layout';
+import { columnsFlexLayout } from '../column-flex-layout';
 import { CharMode, getcharStart } from '../getchar';
 import { logger } from '../util';
 import { BaseComponent } from './Base';
@@ -55,7 +56,7 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
   Confirm.Options<Value>,
   Value
 > {
-  protected static actionCmd = 'floatinput.input.action_' + versionName;
+  protected static actionCmd = `floatinput.input.action_${versionName}`;
   protected static _inited = false;
 
   protected readonly defaultValues = ['yes', 'no'] as Value[];
@@ -111,7 +112,7 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
           `${value[0].toUpperCase()}${value.slice(1)} (${value[0]})`;
         return {
           text,
-          value: value as Value,
+          value,
           width: await displayWidth(text),
         };
       }),
@@ -130,7 +131,10 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
     return finalOptions;
   }
 
-  protected async waitUserInput(instance: Instance, values: Value[]) {
+  protected async waitUserInput(
+    instance: Instance,
+    values: Value[],
+  ): Promise<void> {
     try {
       const value = await getcharStart<Value>(
         async ({ char: ch, mode, stop, matchCode }) => {
@@ -185,7 +189,7 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
     }
   }
 
-  protected async updateHighlights(instance: Instance) {
+  protected async updateHighlights(instance: Instance): Promise<void> {
     workspace.nvim.pauseNotification();
     instance.floatWinDict.btn.buffer.clearNamespace(this.srcId);
     this.btnLinesLayout?.forEach((line) => {
@@ -206,7 +210,10 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
     await workspace.nvim.resumeNotification();
   }
 
-  protected async _open(instance: Instance, options: Confirm.Options<Value>) {
+  protected async _open(
+    instance: Instance,
+    options: Confirm.Options<Value>,
+  ): Promise<void> {
     const values = options.values ?? this.defaultValues;
     this.value = options.defaultValue ?? values[values.length - 1];
     await instance.open(await this.getFinalOpenOptions(options));
@@ -214,12 +221,15 @@ export class Confirm<Value extends string = 'yes' | 'no'> extends BaseComponent<
     this.waitUserInput(instance, values).catch(logger.error);
   }
 
-  protected async _resize(instance: Instance, options: Confirm.Options<Value>) {
+  protected async _resize(
+    instance: Instance,
+    options: Confirm.Options<Value>,
+  ): Promise<void> {
     await instance.resize(await this.getFinalOpenOptions(options));
     await this.updateHighlights(instance);
   }
 
-  protected async _close(instance: Instance) {
+  protected async _close(instance: Instance): Promise<void> {
     await instance.close();
   }
 }

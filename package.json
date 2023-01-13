@@ -25,10 +25,9 @@
     "build:type": "tsc --emitDeclarationOnly",
     "build:pack": "node build.js",
     "build": "run-s build:type build:pack",
-    "prepare": "npm-run-all clean build",
+    "prepare": "run-s clean build",
     "lint": "eslint src --ext js,ts",
-    "unittest": "jest --runInBand --detectOpenHandles --forceExit",
-    "test": "run-s lint unittest"
+    "test": "run-s lint"
   },
   "prettier": {
     "singleQuote": true,
@@ -37,22 +36,16 @@
     "semi": true
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/node": "^16.4.13",
-    "@typescript-eslint/eslint-plugin": "^4.29.0",
-    "@typescript-eslint/parser": "^4.29.0",
-    "chokidar": "^3.5.2",
-    "coc.nvim": "0.0.81-next.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "jest": "^27.0.6",
+    "@raidou/eslint-config-base": "^1.6.0",
+    "@types/node": "^18.11.18",
+    "chokidar": "^3.5.3",
+    "coc.nvim": "0.0.83-next.9",
+    "eslint": "^8.31.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.3.2",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^27.0.4",
-    "type-fest": "^2.0.0",
-    "typescript": "^4.3.5"
+    "prettier": "^2.8.2",
+    "rimraf": "^4.0.4",
+    "type-fest": "^3.5.1",
+    "typescript": "^4.9.4"
   },
   "activationEvents": [
     "*"
@@ -114,7 +107,7 @@
     ]
   },
   "dependencies": {
-    "coc-helper": "^0.13.0",
-    "esbuild": "^0.12.19"
+    "coc-helper": "^0.16.0",
+    "esbuild": "^0.16.17"
   }
 }

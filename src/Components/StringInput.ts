@@ -13,7 +13,7 @@ export class StringInput extends Input<string> {
     return str;
   }
 
-  protected async validateContent(_str: string): Promise<boolean> {
+  protected async validateContent(): Promise<boolean> {
     return true;
   }
 }

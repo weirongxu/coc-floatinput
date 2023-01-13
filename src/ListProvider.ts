@@ -1,13 +1,15 @@
-import {
+import type {
   CompletionItemProvider,
-  workspace,
-  commands,
   Document,
   CompletionItem,
+  TextDocument,
+} from 'coc.nvim';
+import {
+  workspace,
+  commands,
   Position,
   Range,
   CompletionItemKind,
-  TextDocument,
 } from 'coc.nvim';
 
 type ListItem = { name: string; kind?: CompletionItemKind };

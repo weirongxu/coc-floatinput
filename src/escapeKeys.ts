@@ -1,4 +1,4 @@
-import { VimModule } from 'coc-helper';
+import { workspace } from 'coc.nvim';
 
 export const keyNames = [
   '<Plug>',
@@ -78,28 +78,8 @@ export const keyNames = [
 
 export type KeyNames = typeof keyNames[number];
 
-export async function nameToCode() {
-  return await escapedKeysModule.nameToCode.get();
+export async function nameToCode(): Promise<Record<string, string>> {
+  return (await workspace.nvim.call(
+    'coc_floatinput#escaped_keys#name_to_code',
+  )) as Record<string, string>;
 }
-
-export async function codeToName() {
-  const nameToCode = await escapedKeysModule.nameToCode.get();
-  const codeToName: Record<string, KeyNames> = {};
-  Object.entries(nameToCode).forEach(([name, code]) => {
-    codeToName[code] = name as KeyNames;
-  });
-  return codeToName;
-}
-
-export const escapedKeysModule = VimModule.create('escaped_keys', (m) => {
-  const nameToCodeExpr = `{${keyNames
-    .map((k) => `"${k}": "\\${k}"`)
-    .join(',')}}`;
-  const nameToCode = m.var<Record<KeyNames, string>>(
-    'codes_to_name',
-    nameToCodeExpr,
-  );
-  return {
-    nameToCode,
-  };
-});

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 exports.build = (production) => {
   require('esbuild')
     .build({

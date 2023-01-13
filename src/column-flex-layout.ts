@@ -1,19 +1,15 @@
-import { sum, byteLength } from 'coc-helper';
-import { Merge } from 'type-fest';
+import { byteLength, sum } from 'coc-helper';
 
 export interface BaseColumn {
   text: string;
   width: number;
 }
 
-export type ColumnLayout<C extends BaseColumn> = Merge<
-  C,
-  {
-    line: number;
-    colStart: number;
-    colEnd: number;
-  }
->;
+export type ColumnLayout<C extends BaseColumn> = C & {
+  line: number;
+  colStart: number;
+  colEnd: number;
+};
 
 function divideSpacesBy(fullSpaceWidth: number, columns: BaseColumn[]) {
   const spaceUnit = Math.ceil(fullSpaceWidth / columns.length);
@@ -50,7 +46,7 @@ function columnFlexLayout<C extends BaseColumn>(
       text = ` ${c.text} `;
     }
     if (i !== 0) {
-      text = '|' + text;
+      text = `|${text}`;
       col += 1;
     }
     const colStart = col;

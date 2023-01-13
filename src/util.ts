@@ -1,5 +1,5 @@
 import { getConfigLocal, HelperLogger, sleep } from 'coc-helper';
-import { Document } from 'coc.nvim';
+import type { Document } from 'coc.nvim';
 
 export const logger = new HelperLogger('floatinput');
 

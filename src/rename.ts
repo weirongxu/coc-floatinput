@@ -1,12 +1,5 @@
-import {
-  workspace,
-  Document,
-  languages,
-  ExtensionContext,
-  commands,
-  window,
-  Position,
-} from 'coc.nvim';
+import type { Document, ExtensionContext, Position } from 'coc.nvim';
+import { workspace, languages, commands, window } from 'coc.nvim';
 import { logger, synchronizeDocument } from './util';
 import { CocSymbolProvider } from './ListProvider';
 import { StringInput } from './Components/StringInput';
@@ -34,7 +27,10 @@ async function getPrepareRename(doc: Document, position: Position) {
   return prepare;
 }
 
-async function getCurrentWord(doc: Document, position: Position) {
+async function getCurrentWord(
+  doc: Document,
+  position: Position,
+): Promise<string | undefined> {
   const prepare = await getPrepareRename(doc, position);
   if (!prepare) {
     return;
@@ -46,7 +42,7 @@ async function getCurrentWord(doc: Document, position: Position) {
   return word;
 }
 
-export async function registerRename(context: ExtensionContext) {
+export async function registerRename(context: ExtensionContext): Promise<void> {
   const provider = new CocSymbolProvider();
 
   const input = new StringInput();
@@ -71,7 +67,7 @@ export async function registerRename(context: ExtensionContext) {
       filetype: 'floatinput_coc_rename',
       relative: 'cursor-around',
       defaultValue: word,
-      prompt: word + ' ->',
+      prompt: `${word} ->`,
       completion: {
         short: 'C',
         provider,

@@ -1,8 +1,9 @@
-import { HelperEventEmitter, VimModule } from 'coc-helper';
-import { commands } from 'coc.nvim';
-import { KeyNames, nameToCode } from './escapeKeys';
+import { HelperEventEmitter } from 'coc-helper';
+import { workspace } from 'coc.nvim';
+import type { LiteralUnion } from 'type-fest';
+import type { KeyNames } from './escapeKeys';
+import { nameToCode } from './escapeKeys';
 import { logger } from './util';
-import { LiteralUnion } from 'type-fest';
 
 export enum CharMode {
   none = 0,
@@ -36,7 +37,7 @@ export async function getcharStart<R = void>(
   }) => unknown,
 ): Promise<R | undefined> {
   const codes = await nameToCode();
-  getcharModule.startPrompt.call().catch(logger.error);
+  getcharModule.startPrompt().catch(logger.error);
   const onInputChar_: typeof onInputChar = logger.asyncCatch(onInputChar);
   const matchCodeWith = (
     char: string,
@@ -47,11 +48,11 @@ export async function getcharStart<R = void>(
     );
   return await new Promise<R | undefined>((resolve) => {
     const stop = async (result?: R) => {
-      await getcharModule.stopPrompt.call();
+      await getcharModule.stopPrompt();
       disposable.dispose();
       resolve(result);
     };
-    const disposable = getcharEvent.on('InputChar', (char, mode) => {
+    const disposable = getcharEvents.on('InputChar', (char, mode) => {
       onInputChar_({
         char,
         mode,
@@ -64,72 +65,15 @@ export async function getcharStart<R = void>(
   });
 }
 
-const getcharEvent = new HelperEventEmitter<{
+export const getcharEvents = new HelperEventEmitter<{
   InputChar: (ch: string, mode: CharMode) => void;
 }>(logger);
 
-export const getcharModule = VimModule.create('getchar', (m) => {
-  const activated = m.var('activated', '0');
-
-  m.registerInit('register getchar', (context) => {
-    context.subscriptions.push(
-      commands.registerCommand(
-        'floatinput.inputchar',
-        (ch: string, mode: CharMode) => {
-          getcharEvent.fire('InputChar', ch, mode).catch(logger.error);
-        },
-        undefined,
-        true,
-      ),
-    );
-  });
-
-  const getc = m.fn<[], string>(
-    'getc',
-    ({ name }) => `
-      function! ${name}() abort
-        try
-          let c = getchar()
-          return type(c) == type(0) ? nr2char(c) : c
-        catch /^Vim:Interrupt$/
-          return "\\<C-c>"
-        endtry
-      endfunction
-    `,
-  );
-
-  return {
-    activated,
-    getc,
-    startPrompt: m.fn<[], void>(
-      'start_prompt',
-      ({ name }) => `
-        function! ${name}() abort
-          if ${activated.inline}
-            return
-          endif
-          let ${activated.inline} = 1
-          while ${activated.inline}
-            let ch = ${getc.inlineCall()}
-            if ch ==# "\\<FocusLost>" || ch ==# "\\<FocusGained>" || ch ==# "\\<CursorHold>"
-              continue
-            else
-              call CocActionAsync('runCommand', 'floatinput.inputchar', ch, getcharmod())
-            endif
-          endwhile
-        endfunction
-      `,
-    ),
-    stopPrompt: m.fn<[], void>(
-      'stop_prompt',
-      ({ name }) => `
-        function! ${name}() abort
-          if ${activated.inline}
-            let ${activated.inline} = 0
-            call feedkeys("\\<C-c>")
-          endif
-        endfunction
-      `,
-    ),
-  };
-});
+export const getcharModule = {
+  async startPrompt(): Promise<void> {
+    await workspace.nvim.call('coc_floatinput#getchar#start_prompt');
+  },
+  async stopPrompt(): Promise<void> {
+    await workspace.nvim.call('coc_floatinput#getchar#stop_prompt');
+  },
+};

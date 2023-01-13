@@ -36,7 +36,7 @@ function columnFlexLayout<C extends BaseColumn>(
   const spaces = divideSpacesBy(spaceWidth, columns);
   let col = 0;
   return columns.map((c, i) => {
-    const space = spaces[i] ?? 0;
+    const space: number = spaces[i] ?? 0;
     let text: string;
     if (space) {
       const left = Math.ceil(space / 2);

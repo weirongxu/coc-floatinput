@@ -13,7 +13,6 @@ import {
   ListProvider,
   VimCommandProvider,
 } from './ListProvider'
-import { registerRename } from './rename'
 import { CocStatusManager } from './status'
 import { configLocal, logger } from './util'
 
@@ -105,7 +104,6 @@ export async function activate(
     }),
   )
 
-  await registerRename(context)
   registerEvents(context)
   await registerRuntimepath(context)
 

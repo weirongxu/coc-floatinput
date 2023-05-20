@@ -100,10 +100,6 @@
       {
         "command": "floatinput.coc.command",
         "title": "floatinput coc command"
-      },
-      {
-        "command": "floatinput.rename",
-        "title": "floatinput coc command"
       }
     ]
   },

@@ -14,7 +14,7 @@ Floating input for coc.nvim
 
 `nmap <silent> <Leader>c: <Plug>(coc-floatinput-coc-command)`
 
-`nmap <silent> <Leader>rn <Plug>(coc-floatinput-rename)`
+~~`nmap <silent> <Leader>rn <Plug>(coc-floatinput-rename)` removed #26~~
 
 ### Screenshots
 

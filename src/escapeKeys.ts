@@ -1,4 +1,4 @@
-import { workspace } from 'coc.nvim';
+import { workspace } from 'coc.nvim'
 
 export const keyNames = [
   '<Plug>',
@@ -74,12 +74,12 @@ export const keyNames = [
   '<A-x>',
   '<A-y>',
   '<A-z>',
-] as const;
+] as const
 
-export type KeyNames = (typeof keyNames)[number];
+export type KeyNames = (typeof keyNames)[number]
 
 export async function nameToCode(): Promise<Record<string, string>> {
   return (await workspace.nvim.call(
     'coc_floatinput#escaped_keys#name_to_code',
-  )) as Record<string, string>;
+  )) as Record<string, string>
 }

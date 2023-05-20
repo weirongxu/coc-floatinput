@@ -1,21 +1,21 @@
-import { activateHelper, registerRuntimepath } from 'coc-helper';
-import type { ExtensionContext } from 'coc.nvim';
-import { commands, window, workspace } from 'coc.nvim';
-import { Confirm } from './Components/Confirm';
-import { Input } from './Components/Input';
-import { IntInput } from './Components/IntInput';
-import { NumberInput } from './Components/NumberInput';
-import { StringInput } from './Components/StringInput';
-import { registerEvents } from './events';
-import { FloatingUI } from './FloatingUI';
+import { activateHelper, registerRuntimepath } from 'coc-helper'
+import type { ExtensionContext } from 'coc.nvim'
+import { commands, window, workspace } from 'coc.nvim'
+import { Confirm } from './Components/Confirm'
+import { Input } from './Components/Input'
+import { IntInput } from './Components/IntInput'
+import { NumberInput } from './Components/NumberInput'
+import { StringInput } from './Components/StringInput'
+import { registerEvents } from './events'
+import { FloatingUI } from './FloatingUI'
 import {
   CocCommandProvider,
   ListProvider,
   VimCommandProvider,
-} from './ListProvider';
-import { registerRename } from './rename';
-import { CocStatusManager } from './status';
-import { configLocal, logger } from './util';
+} from './ListProvider'
+import { registerRename } from './rename'
+import { CocStatusManager } from './status'
+import { configLocal, logger } from './util'
 
 export const FloatInput = {
   components: {
@@ -27,24 +27,23 @@ export const FloatInput = {
   },
   ListProvider,
   FloatingUI,
-};
+}
 
-export type FloatInputType = typeof FloatInput | undefined;
+export type FloatInputType = typeof FloatInput | undefined
 
 export async function activate(
   context: ExtensionContext,
 ): Promise<FloatInputType> {
   if (workspace.isVim) {
-    // eslint-disable-next-line no-restricted-properties
-    window.showMessage('coc-floatinput only support neovim', 'warning');
-    return;
+    await window.showWarningMessage('coc-floatinput only support neovim')
+    return
   }
 
-  const { subscriptions } = context;
+  const { subscriptions } = context
 
-  await activateHelper(context);
+  await activateHelper(context)
 
-  const input = new StringInput();
+  const input = new StringInput()
 
   /**
    * Vim command
@@ -58,23 +57,23 @@ export async function activate(
         short: 'C',
         provider: new VimCommandProvider(),
       },
-    });
+    })
 
     if (!content) {
-      return;
+      return
     }
 
-    return workspace.nvim.command(content);
+    return workspace.nvim.command(content)
   }
   subscriptions.push(
     input,
     commands.registerCommand('floatinput.command', () => {
-      vimCommand().catch(logger.error);
+      vimCommand().catch(logger.error)
     }),
     workspace.registerKeymap(['n', 'i'], 'floatinput-command', () => {
-      vimCommand().catch(logger.error);
+      vimCommand().catch(logger.error)
     }),
-  );
+  )
 
   /**
    * Coc command
@@ -88,33 +87,33 @@ export async function activate(
         short: 'C',
         provider: new CocCommandProvider(),
       },
-    });
+    })
 
     if (!content) {
-      return;
+      return
     }
 
-    return commands.executeCommand(content);
+    return commands.executeCommand(content)
   }
   subscriptions.push(
     input,
     commands.registerCommand('floatinput.coc.command', () => {
-      cocCommand().catch(logger.error);
+      cocCommand().catch(logger.error)
     }),
     workspace.registerKeymap(['n', 'i'], 'floatinput-coc-command', () => {
-      cocCommand().catch(logger.error);
+      cocCommand().catch(logger.error)
     }),
-  );
+  )
 
-  await registerRename(context);
-  registerEvents(context);
-  await registerRuntimepath(context);
+  await registerRename(context)
+  registerEvents(context)
+  await registerRuntimepath(context)
 
-  const config = configLocal();
-  const cocStatusManager = await CocStatusManager.create(context, config);
+  const config = configLocal()
+  const cocStatusManager = await CocStatusManager.create(context, config)
   if (config.get<boolean>('status.enabled')!) {
-    await cocStatusManager.enable();
+    await cocStatusManager.enable()
   }
 
-  return FloatInput;
+  return FloatInput
 }

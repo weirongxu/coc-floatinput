@@ -34,7 +34,7 @@
     "singleQuote": true,
     "printWidth": 80,
     "trailingComma": "all",
-    "semi": true
+    "semi": false
   },
   "devDependencies": {
     "@raidou/eslint-config-base": "^1.6.0",

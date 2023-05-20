@@ -3,33 +3,33 @@ import type {
   Document,
   CompletionItem,
   TextDocument,
-} from 'coc.nvim';
+} from 'coc.nvim'
 import {
   workspace,
   commands,
   Position,
   Range,
   CompletionItemKind,
-} from 'coc.nvim';
+} from 'coc.nvim'
 
-type ListItem = { name: string; kind?: CompletionItemKind };
+type ListItem = { name: string; kind?: CompletionItemKind }
 
 interface SymbolInfo {
-  filepath?: string;
-  lnum: number;
-  col: number;
-  text: string;
-  kind: string;
-  level?: number;
-  containerName?: string;
-  range: Range;
-  selectionRange?: Range;
+  filepath?: string
+  lnum: number
+  col: number
+  text: string
+  kind: string
+  level?: number
+  containerName?: string
+  range: Range
+  selectionRange?: Range
 }
 
 export abstract class ListProvider implements CompletionItemProvider {
-  abstract getList(prefix: string): Promise<ListItem[]>;
+  abstract getList(prefix: string): Promise<ListItem[]>
 
-  completionKind: CompletionItemKind = CompletionItemKind.Method;
+  completionKind: CompletionItemKind = CompletionItemKind.Method
 
   async provideCompletionItems(
     document: TextDocument,
@@ -37,13 +37,13 @@ export abstract class ListProvider implements CompletionItemProvider {
   ): Promise<CompletionItem[]> {
     const currentLine = document.getText(
       Range.create(Position.create(position.line, 0), position),
-    );
-    const list = await this.getList(currentLine);
+    )
+    const list = await this.getList(currentLine)
     return list.map((l) => ({
       label: l.name,
       kind: l.kind ?? this.completionKind,
       insertText: l.name,
-    }));
+    }))
   }
 }
 
@@ -52,10 +52,10 @@ export class VimCommandProvider extends ListProvider {
     const cmds = (await workspace.nvim.call('getcompletion', [
       prefix,
       'cmdline',
-    ])) as string[];
+    ])) as string[]
     return cmds.map((c) => ({
       name: c,
-    }));
+    }))
   }
 }
 
@@ -65,23 +65,23 @@ export class CocCommandProvider extends ListProvider {
       .map((c) => ({
         name: c.id,
       }))
-      .filter((c) => c.name.startsWith(prefix));
+      .filter((c) => c.name.startsWith(prefix))
   }
 }
 
 export class CocSymbolProvider extends ListProvider {
-  document?: Document;
+  document?: Document
 
   async getList(prefix: string): Promise<ListItem[]> {
     if (this.document) {
       const symbols = (await workspace.nvim.call('CocAction', [
         'documentSymbols',
         this.document.bufnr,
-      ])) as SymbolInfo[];
+      ])) as SymbolInfo[]
       return symbols
         .map((s) => ({ name: s.text }))
-        .filter((s) => s.name.startsWith(prefix));
+        .filter((s) => s.name.startsWith(prefix))
     }
-    return [];
+    return []
   }
 }

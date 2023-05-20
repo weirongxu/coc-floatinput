@@ -1,8 +1,8 @@
-import type { Document, ExtensionContext, Position } from 'coc.nvim';
-import { workspace, languages, commands, window } from 'coc.nvim';
-import { logger, synchronizeDocument } from './util';
-import { CocSymbolProvider } from './ListProvider';
-import { StringInput } from './Components/StringInput';
+import type { Document, ExtensionContext, Position } from 'coc.nvim'
+import { workspace, languages, commands, window } from 'coc.nvim'
+import { logger, synchronizeDocument } from './util'
+import { CocSymbolProvider } from './ListProvider'
+import { StringInput } from './Components/StringInput'
 
 async function hasProviderRename() {
   if (!(await workspace.nvim.call('CocHasProvider', 'rename'))) {
@@ -10,57 +10,57 @@ async function hasProviderRename() {
     window.showMessage(
       'Rename provider not found for current document',
       'error',
-    );
-    return false;
+    )
+    return false
   }
-  return true;
+  return true
 }
 
 async function getPrepareRename(doc: Document, position: Position) {
   // @ts-ignore
-  const prepare = await languages.prepareRename(doc.textDocument, position);
+  const prepare = await languages.prepareRename(doc.textDocument, position)
   if (!prepare) {
     // eslint-disable-next-line no-restricted-properties
-    window.showMessage('Invalid position for renmame', 'error');
-    return false;
+    window.showMessage('Invalid position for renmame', 'error')
+    return false
   }
-  return prepare;
+  return prepare
 }
 
 async function getCurrentWord(
   doc: Document,
   position: Position,
 ): Promise<string | undefined> {
-  const prepare = await getPrepareRename(doc, position);
+  const prepare = await getPrepareRename(doc, position)
   if (!prepare) {
-    return;
+    return
   }
   const word =
     'placeholder' in prepare
       ? prepare.placeholder
-      : doc.textDocument.getText(prepare);
-  return word;
+      : doc.textDocument.getText(prepare)
+  return word
 }
 
 export async function registerRename(context: ExtensionContext): Promise<void> {
-  const provider = new CocSymbolProvider();
+  const provider = new CocSymbolProvider()
 
-  const input = new StringInput();
+  const input = new StringInput()
 
   async function rename() {
-    const doc = await workspace.document;
-    await synchronizeDocument(doc);
+    const doc = await workspace.document
+    await synchronizeDocument(doc)
     if (!(await hasProviderRename())) {
-      return;
+      return
     }
 
-    const position = await window.getCursorPosition();
-    const word = await getCurrentWord(doc, position);
+    const position = await window.getCursorPosition()
+    const word = await getCurrentWord(doc, position)
     if (!word) {
-      return;
+      return
     }
 
-    provider.document = doc;
+    provider.document = doc
 
     const result = await input.input({
       title: 'coc-rename',
@@ -72,13 +72,13 @@ export async function registerRename(context: ExtensionContext): Promise<void> {
         short: 'C',
         provider,
       },
-    });
+    })
 
     if (result !== undefined) {
       if (!result) {
         // eslint-disable-next-line no-restricted-properties
-        window.showMessage('Empty name, canceled', 'warning');
-        return;
+        window.showMessage('Empty name, canceled', 'warning')
+        return
       }
 
       // @ts-ignore
@@ -86,23 +86,23 @@ export async function registerRename(context: ExtensionContext): Promise<void> {
         doc.textDocument,
         position,
         result,
-      );
+      )
       if (!edit) {
         // eslint-disable-next-line no-restricted-properties
-        window.showMessage('Invalid position for rename', 'warning');
-        return;
+        window.showMessage('Invalid position for rename', 'warning')
+        return
       }
-      await workspace.applyEdit(edit);
+      await workspace.applyEdit(edit)
     }
   }
 
   context.subscriptions.push(
     input,
     commands.registerCommand('floatinput.rename', () => {
-      rename().catch(logger.error);
+      rename().catch(logger.error)
     }),
     workspace.registerKeymap(['n', 'i'], 'floatinput-rename', () => {
-      rename().catch(logger.error);
+      rename().catch(logger.error)
     }),
-  );
+  )
 }
